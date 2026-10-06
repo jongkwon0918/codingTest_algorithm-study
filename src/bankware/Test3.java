@@ -62,7 +62,13 @@ class Solution2 {
 
         int[] answer = new int[starts.length];
 
-        boolean[] used = new boolean[100];
+        int maxExit = 0;
+        for (int[] row : maze) {
+            for (int cell : row) {
+                maxExit = Math.max(maxExit, cell);
+            }
+        }
+        boolean[] used = new boolean[maxExit + 1];
 
         for (int i = 0; i < starts.length; i++) {
 
@@ -117,7 +123,8 @@ class Solution2 {
 
                 } else if (dist[r][c] == minDist) {
 
-                    if (!used[exit] && (answer == -1 || used[answer] || exit < answer)) {
+                    if ((used[answer] && !used[exit])
+                            || (used[answer] == used[exit] && exit < answer)) {
                         answer = exit;
                     }
                 }

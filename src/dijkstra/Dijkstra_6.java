@@ -1,3 +1,4 @@
+// 문제: 특정한 최단 경로
 package dijkstra;/*방향성이 없는 양방향 그래프가 있습니다. 1번 정점에서 출발하여 N번 정점으로 최단 거리로 이동하려고 합니다.
 단, 임의로 주어진 두 정점 v1과 v2를 반드시 거쳐서 이동해야 합니다.한 번 이동했던 정점이나 간선을 다시 방문할 수 있습니다.
 (즉, 이미 방문했던 곳을 또 지나쳐도 됩니다.)
@@ -59,7 +60,7 @@ class Solution18 {
         long pathB = (long) distFrom1[v2] + distFromV2[v1] + distFromV1[n];
 
         long answer = Math.min(pathA, pathB);
-        if(answer==Integer.MAX_VALUE){
+        if(answer >= Integer.MAX_VALUE){
             return -1;
         }
         return (int) answer;

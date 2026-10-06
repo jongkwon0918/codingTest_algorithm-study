@@ -1,3 +1,4 @@
+// 문제: 숨바꼭질 3
 package dijkstra;/*수빈이는 동생과 숨바꼭질을 하고 있습니다.
 수빈이는 현재 점 N에 있고, 동생은 점 K에 있습니다. 
 수빈이는 걷거나 순간이동을 할 수 있습니다.
@@ -18,7 +19,7 @@ public class Dijkstra_2 {
         int k = 17;
         
         int result = sol.solution(n, k);
-        System.out.println("숨바꼭질 결과: " + result);
+        System.out.println("숨바꼭질 3 결과: " + result);
 
 	}
 }

@@ -1,3 +1,4 @@
+// 문제: 최소비용 구하기
 package dijkstra;/*N개의 도시가 있습니다. 그리고 한 도시에서 출발하여 다른 도시에 도착하는 버스 노선들이 있습니다.
 우리는 도시 start에서 출발하여 도시 end까지 가려고 합니다.
 도시의 개수 N, 버스 노선 정보가 담긴 2차원 배열 fares,
@@ -32,7 +33,7 @@ public class Dijkstra_1 {
 class Solution2 {
     public int solution(int n, int[][] fares, int start, int end) {
         List<List<int[]>> graph = new ArrayList<>();
-        for(int i=0; i<end+1; i++){
+        for(int i=0; i<=n; i++){
             graph.add(new ArrayList<>());
         }
 

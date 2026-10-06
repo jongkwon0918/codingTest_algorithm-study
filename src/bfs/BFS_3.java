@@ -1,3 +1,4 @@
+// 문제: 미로 탐색
 //N * M 크기의 직사각형 미로에 갇혀 있습니다.
 //미로에는 여러 칸이 존재하며, 각 칸은 이동할 수 있는 칸(1) 또는 벽으로 막혀 이동할 수 없는 칸(0)입니다.
 //당신은 현재 (0, 0) 위치에 있고, 미로의 출구는 (N-1, M-1) 위치에 있습니다.
@@ -26,7 +27,7 @@ public class BFS_3 {
 	        };
 	        
 	        int result = sol.solution(maps);
-	        System.out.println("안전지대 결과: " + result);
+	        System.out.println("미로 탐색 결과: " + result);
 	    }
 }
 
@@ -44,6 +45,8 @@ class Solution6 {
         // 좌표 [r, c]를 담을 큐 생성 (클래스 대신 int[] 객체 활용)
         Queue<int[]> queue = new LinkedList<>();
         queue.offer(new int[]{0, 0});
+        boolean[][] visited = new boolean[n][m];
+        visited[0][0] = true;
 
         while (!queue.isEmpty()) {
             int[] current = queue.poll();
@@ -61,7 +64,8 @@ class Solution6 {
                 int nc = c + dc[d];
 
                 // 맵 범위를 벗어나지 않고, 이동 가능한 칸(1)인 경우
-                if (nr >= 0 && nr < n && nc >= 0 && nc < m && maps[nr][nc] == 1) {
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && maps[nr][nc] == 1 && !visited[nr][nc]) {
+                    visited[nr][nc] = true;
                     // 다음 칸에 (현재 거리에 + 1)한 값을 적어 누적 거리 기록 및 방문 처리
                     maps[nr][nc] = maps[r][c] + 1;
                     queue.offer(new int[]{nr, nc});

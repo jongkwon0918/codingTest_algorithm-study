@@ -28,51 +28,41 @@ public class main3 {
 
         int[] answer = solution.solution(jobs);
 
-        System.out.println(answer);
+        System.out.println(Arrays.toString(answer));
     }
 }
 class Solution3 {
 
-    static class Job {
-        int request;
-        int time;
-        int priority;
-        int index;
-
-        Job(int request, int time, int priority, int index) {
-            this.request = request;
-            this.time = time;
-            this.priority = priority;
-            this.index = index;
-        }
-    }
-
     public int[] solution(int[][] jobs) {
         int n = jobs.length;
 
-        Job[] arr = new Job[n];
+        // 원래 입력 순서를 jobs[i][3]에 추가
+        int[][] arr = new int[n][4];
 
         for (int i = 0; i < n; i++) {
-            arr[i] = new Job(
-                    jobs[i][0],
-                    jobs[i][1],
-                    jobs[i][2],
-                    i
-            );
+            arr[i][0] = jobs[i][0]; // 요청시간
+            arr[i][1] = jobs[i][1]; // 처리시간
+            arr[i][2] = jobs[i][2]; // 우선순위
+            arr[i][3] = i;          // 입력순서
         }
 
-        Arrays.sort(arr, Comparator.comparingInt(a -> a.request));
+        // 요청시간 기준 정렬
+        Arrays.sort(arr, (a, b) ->
+                Integer.compare(a[0], b[0]));
 
-        PriorityQueue<Job> pq = new PriorityQueue<>((a, b) -> {
-            if (a.priority != b.priority) {
-                return Integer.compare(b.priority, a.priority);
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> {
+            // 우선순위 높은 순
+            if (a[2] != b[2]) {
+                return Integer.compare(b[2], a[2]);
             }
 
-            if (a.request != b.request) {
-                return Integer.compare(a.request, b.request);
+            // 요청시간 빠른 순
+            if (a[0] != b[0]) {
+                return Integer.compare(a[0], b[0]);
             }
 
-            return Integer.compare(a.index, b.index);
+            // 입력순서 빠른 순
+            return Integer.compare(a[3], b[3]);
         });
 
         int[] answer = new int[n];
@@ -83,20 +73,22 @@ class Solution3 {
 
         while (count < n) {
 
-            while (index < n && arr[index].request <= time) {
+            // 현재 시간까지 들어온 작업 전부 PQ에 추가
+            while (index < n && arr[index][0] <= time) {
                 pq.offer(arr[index]);
                 index++;
             }
 
+            // 처리할 작업이 없으면 다음 요청시간으로 이동
             if (pq.isEmpty()) {
-                time = arr[index].request;
+                time = arr[index][0];
                 continue;
             }
 
-            Job current = pq.poll();
+            int[] current = pq.poll();
 
-            answer[count++] = current.index;
-            time += current.time;
+            answer[count++] = current[3];
+            time += current[1];
         }
 
         return answer;

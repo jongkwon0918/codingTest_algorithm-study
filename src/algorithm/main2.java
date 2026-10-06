@@ -2,9 +2,9 @@
 
 0은 이동할 수 있는 칸, 1은 벽이다.
 
-미로에서 (sr, sc)에서 시작하여 가장 가까운 출구까지 이동하는 최소 칸 수를 구하라.
+미로에서 (sr, sc)에서 시작하여 가장 가까운 출구까지의 최소 이동 횟수를 구하라.
 
-출구는 미로의 가장자리 칸이다.
+출구는 미로의 가장자리 칸이다. 시작 칸은 출구에서 제외한다.
 
 출구에 도착할 수 없다면 -1을 반환한다.*/
 package algorithm;
@@ -64,16 +64,14 @@ class Solution2 {
                 int nr = r + dr[d];
                 int nc = c + dc[d];
 
-                if (nr < 0 || nr >= n || nc < 0 || nc >= m) {
-                    continue;
+                if(nr>=0 && nr<n && nc>=0 && nc<m){
+                    if(maze[nr][nc] != 1 && dist[nr][nc]==-1){
+                        dist[nr][nc] = dist[r][c] + 1;
+                        queue.offer(new int[]{nr, nc});
+
+                    }
                 }
 
-                if (maze[nr][nc] == 1 || dist[nr][nc] != -1) {
-                    continue;
-                }
-
-                dist[nr][nc] = dist[r][c] + 1;
-                queue.offer(new int[]{nr, nc});
             }
         }
 

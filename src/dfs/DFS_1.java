@@ -1,3 +1,4 @@
+// 문제: 네트워크 (프로그래머스)
 //네트워크란 컴퓨터 상호 간에 정보를 교환할 수 있도록 연결된 형태를 의미합니다. 
 //예를 들어, 컴퓨터 A와 B가 직접 연결되어 있고, B와 C가 직접 연결되어 있다면 컴퓨터 A와 C도 간접적으로 연결되어 정보 교환이 가능합니다. 
 //따라서 컴퓨터 A, B, C는 모두 같은 네트워크 상에 있다고 할 수 있습니다.
@@ -23,7 +24,7 @@ public class DFS_1 {
         };
         
         int result = sol.solution(n, computers);
-        System.out.println("컴퓨터 개수: " + result);
+        System.out.println("네트워크 개수: " + result);
     }
 }
 class Solution7 {
