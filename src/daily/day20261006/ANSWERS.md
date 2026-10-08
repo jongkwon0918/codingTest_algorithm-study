@@ -296,7 +296,7 @@ class Solution5 {
         for (int[] row : dist) {
             Arrays.fill(row, -1);
         }
-        Queue<int[]> queue = new ArrayDeque<>();
+        Queue<int[]> queue = new LinkedList<>();
         queue.offer(new int[]{sr, sc});
         dist[sr][sc] = 0;
         int[] dr = {-1, 1, 0, 0};
@@ -318,29 +318,43 @@ class Solution5 {
             }
         }
 
-        int[] best = null;
-        // 행, 열 오름차순으로 검사하여 같은 거리의 우선순위를 지킨다.
+        List<int[]> fishes = new ArrayList<>();
+        // 도달할 수 있고 먹을 수 있는 물고기만 모은다.
         for (int r = 0; r < n; r++) {
             for (int c = 0; c < n; c++) {
                 if (map[r][c] > 0 && map[r][c] < size && dist[r][c] != -1) {
-                    if (best == null || dist[r][c] < best[2]) {
-                        best = new int[]{r, c, dist[r][c]};
-                    }
+                    fishes.add(new int[]{r, c, dist[r][c]});
                 }
             }
         }
-        return best;
+        if (fishes.isEmpty()) {
+            return null;
+        }
+
+        // {행, 열, 거리}: 거리 → 위쪽 → 왼쪽 순으로 정렬한다.
+        fishes.sort((a, b) -> {
+            if (a[2] != b[2]) {
+                return Integer.compare(a[2], b[2]);
+            }
+            if (a[0] != b[0]) {
+                return Integer.compare(a[0], b[0]);
+            }
+            return Integer.compare(a[1], b[1]);
+        });
+        return fishes.get(0);
     }
 }
 ```
 
 ### 핵심 풀이 과정
 
-먹이를 하나 먹을 때마다 현재 크기로 이동 가능한 칸의 BFS 거리를 다시 구한다. 먹을 수 있는 물고기를 행·열 오름차순으로 확인하고 더 짧은 거리일 때만 후보를 교체하면 거리→행→열 우선순위를 지킨다. 이후 위치, 누적 시간, 먹은 마릿수, 크기를 갱신한다. 시작 위치의 9는 0으로 지워야 성장한 상어가 9를 물고기로 오인하지 않는다.
+먹이를 하나 먹을 때마다 현재 크기로 이동 가능한 칸의 BFS 거리를 다시 구한다. 도달해서 먹을 수 있는 물고기를 {행, 열, 거리}로 모아 fishes.sort로 거리→행→열 순으로 정렬한다. fishes.get(0)이 이번에 먹을 물고기다. 이후 위치, 누적 시간, 먹은 마릿수, 크기를 갱신한다. 시작 위치의 9는 0으로 지워야 성장한 상어가 9를 물고기로 오인하지 않는다.
+
+예를 들어 후보가 {(1,0,1), (0,1,1), (2,2,3)}이면 정렬 결과는 {(0,1,1), (1,0,1), (2,2,3)}이다. 거리 1인 두 후보 중 행이 작은 (0,1)을 선택한다. 행도 같으면 열이 작은 후보가 먼저 온다. 거리와 먹을 수 있는 후보는 매번 달라지므로 먹이 선택 때마다 다시 정렬한다. BFS에는 LinkedList를 사용하고, dist로 방문 여부를 판단하므로 별도 visited는 만들지 않는다.
 
 ### 시간복잡도
 
-O(N^4): 물고기는 최대 N²-1마리, 각 탐색은 O(N²). 공간복잡도는 O(N²)입니다.
+O(N^4 log N): 물고기는 최대 N²-1마리이고, 매 선택에서 BFS는 O(N²), 후보 정렬은 최대 O(N² log N)이다. 공간복잡도는 O(N²)입니다.
 
 ### 원본 문제
 

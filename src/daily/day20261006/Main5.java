@@ -6,7 +6,7 @@ import java.util.*;
 5번. 아기 상어
 
 N x N 공간에 아기 상어 한 마리와 물고기들이 있다.
-0은 빈칸, 1~6은 물고기 크기, 9는 상어의 시작 위치이다.
+0은 빈칸, ,1~6은 물고기 크기 9는 상어의 시작 위치이다.
 상어의 초기 크기는 2이며 상하좌우로 한 칸 이동하는 데 1초가 걸린다.
 자신보다 큰 물고기가 있는 칸은 지나갈 수 없다.
 같은 크기의 물고기는 지나갈 수 있지만 먹지 못한다.
@@ -50,9 +50,97 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+
     public int solution(int[][] sea) {
-        // 여기에 풀이를 작성하세요.
-        throw new UnsupportedOperationException("미구현");
+        n = sea.length;
+        int r = 0;
+        int c = 0;
+        int[][] map = new int[n][n];
+
+        for(int i=0; i<n; i++){
+            map[i] = sea[i].clone();
+            for(int j=0; j<n; j++){
+                if(map[i][j]==9){
+                    r = i;
+                    c = j;
+                    map[i][j] = 0;
+                }
+            }
+        }
+
+        int size = 2;
+        int eaten = 0;
+        int time = 0;
+
+        while(true){
+            int[] fish = findFish(map, r, c, size);
+            if(fish == null){
+                return time;
+            }
+            r = fish[0];
+            c = fish[1];
+            time += fish[2];
+            map[r][c] = 0;
+            eaten++;
+            if(eaten == size){
+                size++;
+                eaten = 0;
+            }
+        }
+    }
+
+    private int[] findFish(int[][] map, int r, int c, int size) {
+        int[][] dist = new int[n][n];
+        for(int[] row : dist){
+            Arrays.fill(row, -1);
+        }
+        dist[r][c] = 0;
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{r, c});
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+
+            for(int d=0; d<4; d++){
+                int nr = curr[0]+dr[d];
+                int nc = curr[1]+dc[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<n){
+                    if(map[nr][nc]<=size && dist[nr][nc]==-1){
+                        dist[nr][nc] = dist[curr[0]][curr[1]]+1;
+                        queue.offer(new int[]{nr, nc});
+                    }
+                }
+            }
+        }
+
+        List<int[]> fishes = new ArrayList<>();
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                if(map[i][j]>0 && map[i][j]<size && dist[i][j] != -1){
+                    fishes.add(new int[]{i, j, dist[i][j]});
+                }
+            }
+        }
+
+        if(fishes.isEmpty()){
+            return null;
+        }
+
+        fishes.sort((a,b)-> {
+            if(a[2]!=b[2]){
+                return Integer.compare(a[2],b[2]);
+            }
+            if(a[0]!=b[0]){
+                return Integer.compare(a[0], b[0]);
+            }else{
+                return Integer.compare(a[1], b[1]);
+            }
+        });
+        return fishes.get(0);
     }
 }
 
