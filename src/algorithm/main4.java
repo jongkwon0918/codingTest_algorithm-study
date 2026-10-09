@@ -61,10 +61,9 @@ class Solution4 {
             int nr = r + dr[d];
             int nc = c + dc[d];
 
-            if(nr>=0 && nr<n && nc>=0 && nc<m){
-                if (map[nr][nc] == 1) {
-                    dfs(nr, nc);
-                }
+            if (nr>=0 && nr<n && nc>=0 && nc<m
+                    && map[nr][nc] == 1) {
+                dfs(nr, nc);
             }
         }
     }

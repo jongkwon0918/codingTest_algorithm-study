@@ -108,11 +108,10 @@ class Solution5 {
                 int nr = curr[0]+dr[d];
                 int nc = curr[1]+dc[d];
 
-                if(nr>=0 && nr<n && nc>=0 && nc<n){
-                    if(map[nr][nc]<=size && dist[nr][nc]==-1){
-                        dist[nr][nc] = dist[curr[0]][curr[1]]+1;
-                        queue.offer(new int[]{nr, nc});
-                    }
+                if (nr>=0 && nr<n && nc>=0 && nc<n
+                        && map[nr][nc]<=size && dist[nr][nc]==-1) {
+                    dist[nr][nc] = dist[curr[0]][curr[1]]+1;
+                    queue.offer(new int[]{nr, nc});
                 }
             }
         }
@@ -143,4 +142,3 @@ class Solution5 {
         return fishes.get(0);
     }
 }
-

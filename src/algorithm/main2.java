@@ -64,12 +64,10 @@ class Solution2 {
                 int nr = r + dr[d];
                 int nc = c + dc[d];
 
-                if(nr>=0 && nr<n && nc>=0 && nc<m){
-                    if(maze[nr][nc] != 1 && dist[nr][nc]==-1){
-                        dist[nr][nc] = dist[r][c] + 1;
-                        queue.offer(new int[]{nr, nc});
-
-                    }
+                if (nr>=0 && nr<n && nc>=0 && nc<m
+                        && maze[nr][nc] != 1 && dist[nr][nc]==-1) {
+                    dist[nr][nc] = dist[r][c] + 1;
+                    queue.offer(new int[]{nr, nc});
                 }
 
             }

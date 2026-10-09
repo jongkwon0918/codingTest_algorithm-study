@@ -55,10 +55,8 @@ class Solution2 {
                     for (int d = 0; d < 4; d++) {
                         int nr = current[0] + dr[d];
                         int nc = current[1] + dc[d];
-                        if (nr < 0 || nr >= n || nc < 0 || nc >= m) {
-                            continue;
-                        }
-                        if (paper[nr][nc] == 1 && !visited[nr][nc]) {
+                        if (nr >= 0 && nr < n && nc >= 0 && nc < m
+                                && paper[nr][nc] == 1 && !visited[nr][nc]) {
                             visited[nr][nc] = true;
                             stack.push(new int[]{nr, nc});
                         }

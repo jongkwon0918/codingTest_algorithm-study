@@ -93,11 +93,10 @@ class Solution13 {
                 int nr = r + dr[d];
                 int nc = c + dc[d];
 
-                if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
-                    if (map[nr][nc] > 0 && !visited[nr][nc]) {
-                        visited[nr][nc] = true;
-                        queue.offer(new int[]{nr, nc});
-                    }
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m
+                        && map[nr][nc] > 0 && !visited[nr][nc]) {
+                    visited[nr][nc] = true;
+                    queue.offer(new int[]{nr, nc});
                 }
             }
         }
@@ -118,10 +117,9 @@ class Solution13 {
                     for (int d = 0; d < 4; d++) {
                         int nr = i + dr[d];
                         int nc = j + dc[d];
-                        if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
-                            if (map[nr][nc] == 0) {
-                                seaCount++;
-                            }
+                        if (nr >= 0 && nr < n && nc >= 0 && nc < m
+                                && map[nr][nc] == 0) {
+                            seaCount++;
                         }
                     }
 

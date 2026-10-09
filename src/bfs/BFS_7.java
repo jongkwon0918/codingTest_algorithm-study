@@ -75,11 +75,10 @@ class Solution15{
                 int nr = r + dr[d];
                 int nc = c + dc[d];
                 
-                if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
-                    if (map[nr][nc] != '#' && fireTime[nr][nc] == -1) {
-                        fireTime[nr][nc] = fireTime[r][c] + 1;
-                        fireQueue.offer(new int[]{nr, nc});
-                    }
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m
+                        && map[nr][nc] != '#' && fireTime[nr][nc] == -1) {
+                    fireTime[nr][nc] = fireTime[r][c] + 1;
+                    fireQueue.offer(new int[]{nr, nc});
                 }
             }
         }
@@ -99,16 +98,13 @@ class Solution15{
                 int nr = r + dr[d];
                 int nc = c + dc[d];
                 
-                if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
-                    // 벽이 아니고 아직 방문하지 않은 곳
-                    if (map[nr][nc] != '#' && jihoonTime[nr][nc] == -1) {
-                        int nextTime = jihoonTime[r][c] + 1;
-                        
-                        // 불이 아예 안 오거나(fireTime == -1), 불보다 먼저 도착할 수 있는 경우에만 이동
-                        if (fireTime[nr][nc] == -1 || nextTime < fireTime[nr][nc]) {
-                            jihoonTime[nr][nc] = nextTime;
-                            jihoonQueue.offer(new int[]{nr, nc});
-                        }
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m
+                        && map[nr][nc] != '#' && jihoonTime[nr][nc] == -1) {
+                    int nextTime = jihoonTime[r][c] + 1;
+
+                    if (fireTime[nr][nc] == -1 || nextTime < fireTime[nr][nc]) {
+                        jihoonTime[nr][nc] = nextTime;
+                        jihoonQueue.offer(new int[]{nr, nc});
                     }
                 }
             }

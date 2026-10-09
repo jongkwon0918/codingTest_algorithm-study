@@ -58,11 +58,10 @@ class Solution21 {
                 int nc = c + dc[i];
 
                 // 체스판 범위를 벗어나지 않고, 아직 방문하지 않은 칸(-1)인 경우
-                if (nr >= 0 && nr < l && nc >= 0 && nc < l) {
-                    if (dist[nr][nc] == -1) {
-                        dist[nr][nc] = dist[r][c] + 1;
-                        queue.offer(new int[]{nr, nc});
-                    }
+                if (nr >= 0 && nr < l && nc >= 0 && nc < l
+                        && dist[nr][nc] == -1) {
+                    dist[nr][nc] = dist[r][c] + 1;
+                    queue.offer(new int[]{nr, nc});
                 }
             }
         }

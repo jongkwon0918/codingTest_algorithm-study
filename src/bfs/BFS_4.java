@@ -86,12 +86,10 @@ class Solution11 {
                 int nr = r + dr[d];
                 int nc = c + dc[d];
 
-                if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
-                    // 방문하지 않았고, 현재 색상과 동일한 글자라면 계속 확장
-                    if (!visited[nr][nc] && targetMap[nr][nc] == color) {
-                        visited[nr][nc] = true;
-                        queue.offer(new int[]{nr, nc});
-                    }
+                if (nr >= 0 && nr < n && nc >= 0 && nc < n
+                        && !visited[nr][nc] && targetMap[nr][nc] == color) {
+                    visited[nr][nc] = true;
+                    queue.offer(new int[]{nr, nc});
                 }
             }
         }

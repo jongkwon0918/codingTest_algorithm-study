@@ -70,12 +70,11 @@ class Solution14 {
                 int nr = r + dr[i];
                 int nc = c + dc[i];
 
-                if (nh >= 0 && nh < hSize && nr >= 0 && nr < nSize && nc >= 0 && nc < mSize) {
-                    if (box[nh][nr][nc] == 0) {
-                        box[nh][nr][nc] = 1;
-                        queue.offer(new int[]{nh, nr, nc, day+1});
-                        unripeCount--;
-                    }
+                if (nh >= 0 && nh < hSize && nr >= 0 && nr < nSize && nc >= 0 && nc < mSize
+                        && box[nh][nr][nc] == 0) {
+                    box[nh][nr][nc] = 1;
+                    queue.offer(new int[]{nh, nr, nc, day+1});
+                    unripeCount--;
                 }
             }
         }

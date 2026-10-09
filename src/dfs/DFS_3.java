@@ -88,12 +88,10 @@ class Solution9 {
                 int nr = cr + dr[d];
                 int nc = cc + dc[d];
                 
-                if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
-                    // 물에 잠기지 않고(> h) 아직 방문하지 않은 곳이라면 큐에 추가
-                    if (map[nr][nc] > h && !visited[nr][nc]) {
-                        visited[nr][nc] = true;
-                        queue.offer(new int[]{nr, nc});
-                    }
+                if (nr >= 0 && nr < n && nc >= 0 && nc < n
+                        && map[nr][nc] > h && !visited[nr][nc]) {
+                    visited[nr][nc] = true;
+                    queue.offer(new int[]{nr, nc});
                 }
             }
         }
