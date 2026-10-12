@@ -33,9 +33,46 @@ public class Main1 {
 }
 
 class Solution1 {
+    int n;
+    int m;
+    int[] dr  = {-1,1,0,0};
+    int[] dc  = {0,0,-1,1};
+    boolean[][] visited;
     public int solution(int[][] field) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = field.length;
+        m = field[0].length;
+        visited = new boolean[n][m];
+
+        int count=0;
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(field[i][j]==1 && !visited[i][j]){
+                    dfs(field, i, j);
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    private void dfs(int[][] field, int i, int j) {
+        visited[i][j]=true;
+
+        for(int d=0; d<4; d++){
+            int nr = i+dr[d];
+            int nc = j+dc[d];
+
+            if(nr>=0 && nr<n && nc>=0 && nc<m){
+                if(field[nr][nc]==1 && !visited[nr][nc]){
+                    dfs(field, nr, nc);
+                }
+            }
+
+        }
+
+
     }
 }
 

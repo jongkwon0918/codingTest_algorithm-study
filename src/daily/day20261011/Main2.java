@@ -34,8 +34,57 @@ public class Main2 {
 
 class Solution2 {
     public int[] solution(int n, int[][] roads) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] road : roads){
+            int u = road[0];
+            int v = road[1];
+            graph.get(u).add(v);
+            graph.get(v).add(u);
+        }
+
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[1] = 0;
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{1,0});
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+            for(int next : graph.get(currStart)){
+                int nextCost = currCost+1;
+                if(dist[next]>nextCost){
+                    dist[next] = nextCost;
+                    queue.offer(new int[]{next, nextCost});
+                }
+            }
+        }
+        int maxFar = 0;
+        for(int i=1; i<=n; i++){
+            maxFar = Math.max(maxFar, dist[i]);
+        }
+
+        List<Integer>  list = new ArrayList<>();
+        int count = 0;
+        for(int i=1; i<=n; i++){
+            if(dist[i] == maxFar){
+                list.add(i);
+                count++;
+            }
+        }
+
+        return new int[]{list.get(0),
+                maxFar,
+                count};
     }
 }
 

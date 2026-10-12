@@ -40,9 +40,67 @@ public class Main4 {
 }
 
 class Solution4 {
+    int n;
+    int m;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    int[] jr = {-2,-2,-1,-1,1,1,2,2};
+    int[] jc = {-1,1,-2,2,-2,2,-1,1};
     public int solution(int[][] map, int k) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = map.length;
+        m = map[0].length;
+
+        if(n-1 == 0 && m-1 == 0) return 0;
+
+        int[][][] dist = new int[n][m][k+1];
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++) {
+                Arrays.fill(dist[i][j], Integer.MAX_VALUE);
+            }
+        }
+        dist[0][0][k] = 0;
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{0,0,0,k});
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int cost = curr[2];
+            int restK = curr[3];
+
+            if(r==n-1 && c==m-1){
+                return cost;
+            }
+
+            if(restK>0){
+                for(int j=0; j<8; j++){
+                    int nr = r+jr[j];
+                    int nc = c+jc[j];
+
+                    if(nr>=0 && nr<n && nc>=0 && nc<m){
+                        if(dist[nr][nc][restK-1]>cost+1 && map[nr][nc]==0){
+                            dist[nr][nc][restK-1] = cost+1;
+                            queue.offer(new int[]{nr, nc, cost+1, restK-1});
+                        }
+                    }
+                }
+            }
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<m){
+                    if(dist[nr][nc][restK]>cost+1 && map[nr][nc]==0){
+                        dist[nr][nc][restK] = cost+1;
+                        queue.offer(new int[]{nr, nc, cost+1, restK});
+                    }
+                }
+            }
+        }
+
+        return -1;
     }
 }
 

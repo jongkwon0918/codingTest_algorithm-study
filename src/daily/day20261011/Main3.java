@@ -40,8 +40,51 @@ public class Main3 {
 
 class Solution3 {
     public long solution(int[] visible, int[][] roads) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        int n = visible.length;
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] road : roads){
+            int u = road[0];
+            int v = road[1];
+            int w = road[2];
+
+            graph.get(u).add(new int[]{v,w});
+            graph.get(v).add(new int[]{u,w});
+        }
+
+        long[] dist = new long[n];
+        Arrays.fill(dist, Long.MAX_VALUE);
+        dist[0] = 0;
+
+        PriorityQueue<long[]> pq = new PriorityQueue<>((a,b)->Long.compare(a[1],b[1]));
+        pq.offer(new long[]{0,0});
+
+        while(!pq.isEmpty()){
+            long[] curr = pq.poll();
+            int currStart = (int) curr[0];
+            long currCost = curr[1];
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+            if(currStart==n-1){
+                return currCost;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                long nextCurr = currCost + next[1];
+
+                if((visible[nextStart]==0 || nextStart==n-1) && dist[nextStart]>nextCurr){
+                    dist[nextStart] = nextCurr;
+                    pq.offer(new long[]{nextStart, nextCurr});
+                }
+            }
+        }
+
+        return -1;
     }
 }
 
