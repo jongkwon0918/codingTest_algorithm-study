@@ -38,8 +38,79 @@ public class Main1 {
 
 class Solution1 {
     public int[][] solution(int n, int[][] edges, int start) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<Integer>[] graph = new ArrayList[n+1];
+        for(int i=0; i<=n; i++){
+            graph[i] = new ArrayList<>();
+        }
+        for(int[] edge : edges){
+            int u = edge[0];
+            int v = edge[1];
+
+            graph[u].add(v);
+            graph[v].add(u);
+        }
+        boolean[] visited;
+        visited = new boolean[n+1];
+        List<Integer> list1 = new ArrayList<>();
+        list1.add(start);
+        List<Integer> list2 = new ArrayList<>();
+        list2.add(start);
+
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(start);
+        visited[start] = true;
+
+        for(int i=0; i<=n; i++){
+            Collections.sort(graph[i]);
+        }
+
+        while(!queue.isEmpty()){
+            int curr = queue.poll();
+
+            for(int next : graph[curr]){
+                if(!visited[next]){
+                    queue.offer(next);
+                    visited[next] = true;
+                    list2.add(next);
+                }
+            }
+        }
+
+        visited = new boolean[n+1];
+        queue = new LinkedList<>();
+        queue.offer(start);
+        visited[start] = true;
+        while(!queue.isEmpty()){
+            int curr = queue.poll();
+
+            for(int next : graph[curr]){
+                if(!visited[next]){
+                    queue.offer(next);
+                    dfs(list1, graph, visited, next);
+                }
+            }
+        }
+
+        int[][] answer = new int[2][list1.size()];
+
+
+        for(int j=0; j<list1.size(); j++){
+                answer[0][j] = list1.get(j);
+                answer[1][j] = list2.get(j);
+        }
+
+        return answer;
+    }
+
+    private void dfs(List<Integer> list1, List<Integer>[] graph, boolean[] visited, int next) {
+        visited[next] = true;
+        list1.add(next);
+
+        for(int nextnext : graph[next]){
+            if(!visited[nextnext]){
+                dfs(list1, graph, visited, nextnext);
+            }
+        }
     }
 }
 

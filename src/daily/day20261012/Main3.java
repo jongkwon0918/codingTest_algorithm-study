@@ -42,9 +42,67 @@ public class Main3 {
 }
 
 class Solution3 {
+    int n;
     public int solution(int[] items, int range, int[][] roads) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = items.length;
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] road : roads){
+            int u = road[0];
+            int v = road[1];
+            int w = road[2];
+
+            graph.get(u).add(new int[]{v,w});
+            graph.get(v).add(new int[]{u,w});
+        }
+
+        int maxItem = 0;
+
+        for(int i=1; i<=n; i++){
+            maxItem = Math.max(maxItem, dijkstra(items, range, i, graph));
+        }
+
+        return maxItem;
+    }
+
+    private int dijkstra(int[] items, int range, int start, List<List<int[]>> graph) {
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[start] = 0;
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1], b[1]));
+        pq.offer(new int[]{start, 0});
+
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                int nextCost = currCost+ next[1];
+
+                if(nextCost<=range && dist[nextStart]>nextCost){
+                    pq.offer(new int[]{nextStart, nextCost});
+                    dist[nextStart] = nextCost;
+                }
+            }
+        }
+
+        int item = 0;
+        for (int i = 1; i <= n; i++) {
+            if (dist[i] <= range) {
+                item += items[i - 1];
+            }
+        }
+        return item;
+
     }
 }
 

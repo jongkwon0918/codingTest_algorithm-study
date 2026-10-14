@@ -35,9 +35,55 @@ public class Main2 {
 }
 
 class Solution2 {
+    boolean[] visited;
+    int max;
     public int[][] solution(int start, int target) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        max = 100000;
+        visited = new boolean[max+1];
+        int[] parent = new int[max+1];
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{start,0});
+        visited[start] = true;
+        parent[start] = -1;
+        int time = 0;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(currStart == target){
+                time = currCost;
+                break;
+            }
+
+
+            int[] nexts = {currStart-1, currStart+1, 2*currStart};
+            for(int next : nexts){
+                if(next>=0 && next<=max && !visited[next]){
+                    queue.offer(new int[]{next, currCost+1});
+                    visited[next] = true;
+                    parent[next] = currStart;
+                }
+            }
+        }
+
+        List<Integer> list = new ArrayList<>();
+
+        while(target!=-1){
+            list.add(target);
+            target = parent[target];
+        }
+
+        Collections.reverse(list);
+
+        int[] path = new int[list.size()];
+
+        for(int i=0; i<list.size(); i++){
+            path[i] = list.get(i);
+        }
+        return new int[][]{new int[]{time}, path};
     }
 }
 

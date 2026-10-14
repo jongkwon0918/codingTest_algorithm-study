@@ -45,9 +45,75 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int m;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public int[] solution(int[][] map) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = map.length;
+        m = map[0].length;
+        int time = 0;
+        int count = 0;
+        while(true){
+            int curr = dfs(n,m,map);
+            if(curr!=0){
+                count = curr;
+            }else{
+                return new int[]{time, count};
+            }
+            map = cheeze(map);
+            time++;
+
+        }
+    }
+
+    private int dfs(int n, int m, int[][] map) {
+        int count=0;
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(map[i][j]==1){
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private int[][] cheeze(int[][] map) {
+        int[][] tempMap = new int[n][m];
+        boolean[][] visited = new boolean[n][m];
+        Queue<int[]> queue = new LinkedList<>();
+
+        for(int i=0; i<n; i++){
+            tempMap[i] = map[i].clone();
+        }
+
+        queue.offer(new int[]{0,0});
+        visited[0][0] = true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+                if(nr>=0 && nr<n && nc>=0 && nc<m && !visited[nr][nc]){
+                    visited[nr][nc] = true;
+
+                    if (map[nr][nc] == 0) {
+                        // 외부 공기라면 계속 탐색
+                        queue.offer(new int[]{nr, nc});
+                    } else {
+                        // 외부 공기와 접한 치즈이므로 녹임
+                        tempMap[nr][nc] = 0;
+                    }
+                }
+            }
+        }
+
+        return tempMap;
     }
 }
 
