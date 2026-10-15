@@ -39,9 +39,54 @@ public class Main4 {
 }
 
 class Solution4 {
+    int n;
+    int max;
+    int min;
+
     public int[] solution(int[] numbers, int[] operators) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = numbers.length;
+        max = Integer.MIN_VALUE;
+        min = Integer.MAX_VALUE;
+
+
+        dfs(1, numbers[0], operators, numbers);
+
+
+        return new int[]{max, min};
+    }
+
+    private void dfs(int index, int curr, int[] operators, int[] numbers) {
+        if (index == n) {
+            max = Math.max(max, curr);
+            min = Math.min(min, curr);
+            return;
+        }
+
+        for (int j = 0; j < operators.length; j++) {
+            if (operators[j] > 0) {
+                operators[j]--;
+                int next = 0;
+
+                switch (j) {
+                    case 0:
+                        next = curr + numbers[index];
+                        break;
+                    case 1:
+                        next = curr - numbers[index];
+                        break;
+                    case 2:
+                        next = curr * numbers[index];
+                        break;
+                    case 3:
+                        next = curr / numbers[index];
+                        break;
+                }
+
+                dfs(index + 1, next, operators, numbers);
+                operators[j]++;
+            }
+        }
+
     }
 }
 

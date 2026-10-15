@@ -37,9 +37,89 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int m;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public String solution(String[] board) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = board.length;
+        m = board[0].length();
+        boolean[][] visited = new boolean[n][m];
+
+        char[][] map = new char[n][m];
+        Queue<int[]> queue = new LinkedList<>();
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                map[i][j] = board[i].charAt(j);
+                if(map[i][j]=='S'){
+                    queue.offer(new int[]{i,j,0});
+                    visited[i][j] = true;
+                }
+            }
+        }
+
+        while(!queue.isEmpty()){
+            map = water(map);
+            int size = queue.size();
+            for(int i=0; i<size; i++){
+                int[] curr = queue.poll();
+                int r = curr[0];
+                int c = curr[1];
+                int time = curr[2];
+
+                if(map[r][c]=='D'){
+                    return String.valueOf(time);
+                }
+
+                for(int d=0; d<4; d++){
+                    int nr = r+dr[d];
+                    int nc = c+dc[d];
+
+                    if(nr>=0 && nr<n && nc>=0 && nc<m){
+                        if(!visited[nr][nc] && map[nr][nc]=='.' || map[nr][nc]=='D'){
+                            visited[nr][nc] = true;
+                            queue.offer(new int[]{nr, nc, time+1});
+                        }
+                    }
+                }
+            }
+        }
+
+        return "KAKTUS";
+    }
+
+    private char[][] water(char[][] map) {
+        char[][] tempMap = new char[n][m];
+        Queue<int[]> queue = new LinkedList<>();
+
+        for(int i=0; i<n; i++){
+            tempMap[i] = map[i].clone();
+            for(int j=0; j<m; j++){
+                if(map[i][j] == '*'){
+                    queue.offer(new int[]{i,j});
+                }
+            }
+        }
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<m){
+                    if(map[nr][nc]=='.' || map[nr][nc]=='S'){
+                        tempMap[nr][nc] = '*';
+                    }
+                }
+            }
+        }
+
+        return tempMap;
     }
 }
 

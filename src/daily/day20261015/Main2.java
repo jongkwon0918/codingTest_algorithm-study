@@ -33,9 +33,65 @@ public class Main2 {
 }
 
 class Solution2 {
+    int n;
+    int m;
+    boolean[][] visited;
+    int[][] tempMap;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    int[][] dist;
     public int[][] solution(int[][] map) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = map.length;
+        m = map[0].length;
+        tempMap = new int[n][m];
+        dist = new int[n][m];
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(map[i][j]!=1){
+                    dist[i][j]=0;
+                }else if(map[i][j]==1){
+                    dist[i][j]=-1;
+                }
+            }
+        }
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(map[i][j]==2){
+                    bfs(map, i, j);
+                }
+            }
+        }
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                tempMap[i][j]=dist[i][j];
+            }
+        }
+        return tempMap;
+    }
+
+    private void bfs(int[][] map, int i, int j) {
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{i,j,0});
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int time = curr[2];
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<m && dist[nr][nc]==-1){
+                    queue.offer(new int[]{nr, nc, time+1});
+                    dist[nr][nc] = time+1;
+                }
+            }
+        }
     }
 }
 

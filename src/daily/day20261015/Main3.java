@@ -40,8 +40,58 @@ public class Main3 {
 
 class Solution3 {
     public long[] solution(int n, int[][] roads, int[] centers) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<int[]>[] graph = new ArrayList[n+1];
+        for (int i = 0; i <= n; i++) {
+            graph[i] = new ArrayList<>();
+        }
+        for (int[] road : roads) {
+            int u = road[0];
+            int v = road[1];
+            int w = road[2];
+
+            graph[v].add(new int[]{u, w});
+        }
+
+        long[] dist = new long[n+1];
+        Arrays.fill(dist, Long.MAX_VALUE);
+
+        PriorityQueue<long[]> pq = new PriorityQueue<>((a,b)->Long.compare(a[1], b[1]));
+
+        for (int center : centers) {
+            dist[center] = 0;
+            pq.offer(new long[]{center, 0});
+        }
+
+        while(!pq.isEmpty()){
+            long[] curr = pq.poll();
+            int currStart = (int)curr[0];
+            long currCost = curr[1];
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+
+            for(int[] next : graph[currStart]){
+                int nextStart = next[0];
+                long nextCost = currCost + next[1];
+
+                if(dist[nextStart]>nextCost){
+                    pq.offer(new long[]{nextStart, nextCost});
+                    dist[nextStart]=nextCost;
+                }
+            }
+        }
+
+        int answerCity = 1;
+        long maxCost = dist[1];
+
+        for (int city = 2; city <= n; city++) {
+            if (dist[city] > maxCost) {
+                maxCost = dist[city];
+                answerCity = city;
+            }
+        }
+
+        return new long[]{answerCity, maxCost};
     }
 }
-
