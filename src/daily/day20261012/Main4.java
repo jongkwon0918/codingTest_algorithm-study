@@ -30,9 +30,48 @@ public class Main4 {
 }
 
 class Solution4 {
+    char[] letter;
+    char[] selected;
+    List<String> list;
+    int n;
     public String[] solution(int length, String letters) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = letters.length();
+        list = new ArrayList<>();
+        letter = letters.toCharArray();
+        Arrays.sort(letter);
+        selected = new char[length];
+
+        dfs(0,0, length);
+
+        String[] answer = new String[list.size()];
+        for(int i=0; i<list.size(); i++){
+            answer[i] = list.get(i);
+        }
+
+        return answer;
     }
+
+    private void dfs(int curr, int count, int length) {
+
+        if(count==length){
+            int mo = 0;
+
+            for(char c : selected){
+                if(c=='a' || c=='e' || c=='i' || c=='o' || c=='u'){
+                    mo++;
+                }
+            }
+            if(mo>=1 && length-mo>=2){
+                list.add(new String(selected));
+            }
+            return;
+        }
+
+        for(int i=curr; i<n; i++){
+            selected[count] = letter[i];
+            dfs(i+1, count+1, length);
+        }
+    }
+
 }
 

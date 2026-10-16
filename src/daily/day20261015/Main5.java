@@ -55,9 +55,87 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    int answerTime;
+    int count;
+    List<int[]> list;
+    int[] selected;
+    boolean[][] visited;
     public int solution(int[][] lab, int m) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = lab.length;
+        list = new ArrayList<>();
+        selected = new int[m];
+        answerTime = Integer.MAX_VALUE;
+        count = 0;
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++) {
+                if(lab[i][j]==0){
+                    count++;
+                }
+                if(lab[i][j]==2){
+                    list.add(new int[]{i,j});
+                }
+            }
+        }
+        if(count==0){
+            return 0;
+        }
+
+        dfs(0, 0, lab, m);
+
+        return answerTime==Integer.MAX_VALUE?-1:answerTime;
+    }
+
+    private void dfs(int start, int choice, int[][] lab, int m) {
+        if (choice == m) {
+            Queue<int[]> queue = new LinkedList<>();
+            visited = new boolean[n][n];
+            for (int index : selected) {
+                int[] virus = list.get(index);
+                int r = virus[0];
+                int c = virus[1];
+                queue.offer(new int[]{r, c, 0});
+                visited[r][c] = true;
+            }
+            bfs(queue, lab);
+            return;
+        }
+
+        for (int i = start; i < list.size(); i++) {
+            selected[choice] = i;
+            dfs(i + 1, choice + 1, lab, m);
+        }
+    }
+
+    private void bfs(Queue<int[]> queue, int[][] lab) {
+        int remaining = count;
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int time = curr[2];
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<n && !visited[nr][nc] && lab[nr][nc]!=1){
+                    if(lab[nr][nc]==0){
+                        remaining--;
+
+                        if(remaining==0){
+                            answerTime = Math.min(answerTime, time+1);
+                            return;
+                        }
+                    }
+                    queue.offer(new int[]{nr, nc, time+1});
+                    visited[nr][nc]=true;
+                }
+            }
+        }
     }
 }
 
