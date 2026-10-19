@@ -36,9 +36,49 @@ public class Main3 {
 }
 
 class Solution3 {
+    boolean[] visited;
     public int solution(int[][] ladders, int[][] snakes) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        visited = new boolean[101];
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{1,0});
+        visited[1] = true;
+
+        int[] move = new int[101];
+        for(int[] ladder : ladders){
+            move[ladder[0]] = ladder[1];
+        }
+        for(int[] snake : snakes){
+            move[snake[0]] = snake[1];
+        }
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int currPoint = curr[0];
+            int currCost = curr[1];
+
+            if(currPoint == 100){
+                return currCost;
+            }
+
+            int[] nexts = {1,2,3,4,5,6};
+            for(int next : nexts){
+                int nextPoint = currPoint+next;
+                int nextCost = currCost+1;
+
+                if(nextPoint<=100){
+                    if(move[nextPoint] != 0){
+                        nextPoint = move[nextPoint];
+                    }
+
+                    if(!visited[nextPoint]){
+                        queue.offer(new int[]{nextPoint, nextCost});
+                        visited[nextPoint] = true;
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 }
 

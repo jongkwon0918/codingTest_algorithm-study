@@ -37,9 +37,56 @@ public class Main4 {
 }
 
 class Solution4 {
+    int n;
+    int answer;
     public int solution(int[][] eggs) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = eggs.length;
+        answer = 0;
+
+        dfs(eggs, 0);
+
+        return answer;
+    }
+
+    private void dfs(int[][] eggs, int currEgg) {
+        if (currEgg == n) {
+            int count = 0;
+            for (int i = 0; i < n; i++) {
+                if (eggs[i][0] <= 0) {
+                    count++;
+                }
+            }
+            answer = Math.max(answer, count);
+            return;
+        }
+
+        // 기존에는 손의 계란이 깨졌을 때 다음 차례를 진행하지 못했다.
+        if (eggs[currEgg][0] <= 0) {
+            dfs(eggs, currEgg + 1);
+            return;
+        }
+
+        boolean hit = false;
+        for (int i = 0; i < n; i++) {
+            if (currEgg != i && eggs[i][0] > 0) {
+                hit = true;
+                int beforeTarget = eggs[i][0];
+                int beforeCurrent = eggs[currEgg][0];
+
+                eggs[currEgg][0] -= eggs[i][1];
+                eggs[i][0] -= eggs[currEgg][1];
+
+                dfs(eggs, currEgg + 1);
+
+                eggs[currEgg][0] = beforeCurrent;
+                eggs[i][0] = beforeTarget;
+            }
+        }
+
+        // 기존에는 칠 상대가 없을 때도 다음 차례를 진행하지 못했다.
+        if (!hit) {
+            dfs(eggs, currEgg + 1);
+        }
     }
 }
 
