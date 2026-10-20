@@ -34,9 +34,37 @@ public class Main2 {
 }
 
 class Solution2 {
+    int[] dr = {-2,-2,0,0,2,2};
+    int[] dc = {-1,1,-2,2,-1,1};
+    boolean[][] visited;
     public int solution(int n, int[] start, int[] target) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{start[0], start[1], 0});
+        visited = new boolean[n][n];
+        visited[start[0]][start[1]] = true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int cost = curr[2];
+
+            if(r==target[0] && c==target[1]){
+                return cost;
+            }
+
+            for(int d=0; d<6; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<n && !visited[nr][nc]){
+                    queue.offer(new int[]{nr, nc, cost+1});
+                    visited[nr][nc] = true;
+                }
+            }
+        }
+
+        return -1;
     }
 }
 

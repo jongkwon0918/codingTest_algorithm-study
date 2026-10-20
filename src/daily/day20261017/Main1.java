@@ -32,9 +32,39 @@ public class Main1 {
 }
 
 class Solution1 {
+    int n;
+    int[] jr = {1,0};
+    int[] jc = {0,1};
+    boolean[][] visited;
     public String solution(int[][] board) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = board.length;
+        visited = new boolean[n][n];
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{0,0});
+        visited[0][0] = true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            if(board[r][c]==-1){
+                return "HaruHaru";
+            }
+
+            for(int d=0; d<2; d++){
+                int nr = board[r][c]*jr[d] + r;
+                int nc = board[r][c]*jc[d] + c;
+
+                if(nr>=0 && nr<n && nc>=0 && nc<n && !visited[nr][nc]){
+                    queue.offer(new int[]{nr, nc});
+                    visited[nr][nc] = true;
+                }
+            }
+        }
+
+
+        return "Hing";
     }
 }
 

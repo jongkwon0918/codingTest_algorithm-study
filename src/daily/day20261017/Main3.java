@@ -41,8 +41,69 @@ public class Main3 {
 
 class Solution3 {
     public int solution(int n, int[][] roads, int dailyLimit, int home) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] road : roads){
+            int u = road[0];
+            int v = road[1];
+            int w = road[2];
+
+            graph.get(u).add(new int[]{v, w});
+            graph.get(v).add(new int[]{u, w});
+        }
+
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[home] = 0;
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1], b[1]));
+        pq.offer(new int[]{home, 0});
+
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                int nextCost = currCost + next[1];
+
+                if(dist[nextStart]>nextCost){
+                    dist[nextStart] = nextCost;
+                    pq.offer(new int[]{nextStart, nextCost});
+                }
+            }
+        }
+        Arrays.sort(dist);
+
+        int dailyWalk = 0;
+        int days = 1;
+        for(int i=0; i<n; i++){
+            if(dist[i]==Integer.MAX_VALUE) {
+                days=-1;
+                break;
+            }
+            int roundTrip = dist[i] * 2;
+
+            if (roundTrip > dailyLimit) {
+                return -1;
+            }
+
+            dailyWalk+=roundTrip;
+
+            if (dailyWalk > dailyLimit) {
+                days++;
+                dailyWalk = roundTrip;
+            }
+        }
+
+        return days;
     }
 }
-
