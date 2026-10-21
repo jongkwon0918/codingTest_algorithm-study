@@ -1,5 +1,6 @@
 package daily.day20261020;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /*
@@ -34,8 +35,50 @@ public class Main2 {
 
 class Solution2 {
     public String[] solution(int n, int[][] edges, int start) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] edge : edges){
+            int u = edge[0];
+            int v = edge[1];
+            int w = edge[2];
+
+            graph.get(u).add(new int[]{v, w});
+        }
+
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[start]=0;
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1],b[1]));
+        pq.offer(new int[]{start,0});
+        String[] answer = new String[n];
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                int nextCost = currCost+next[1];
+
+                if(dist[nextStart]>nextCost){
+                    pq.offer(new int[]{nextStart, nextCost});
+                    dist[nextStart] = nextCost;
+                }
+            }
+        }
+
+        for(int i=0; i<n; i++){
+            answer[i] = (dist[i+1]==Integer.MAX_VALUE?"INF":String.valueOf(dist[i+1]));
+        }
+
+        return answer;
     }
 }
 

@@ -34,9 +34,85 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    int[][] tempMap;
+    boolean[][] visited;
+    int minCount;
     public int solution(int[][] map) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = map.length;
+        tempMap = new int[n][n];
+        visited = new boolean[n][n];
+
+        for(int t=0; t<n; t++){
+            Arrays.fill(tempMap[t], 0);
+        }
+
+        int num=1;
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                if(!visited[i][j] && map[i][j]==1) {
+                    dfs(map, i, j, num);
+                    num++;
+                }
+            }
+        }
+
+        boolean[][] mapVisited;
+        minCount = Integer.MAX_VALUE;
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++) {
+                if(tempMap[i][j]!=0){
+                    mapVisited = new boolean[n][n];
+                    Queue<int[]> queue = new LinkedList<>();
+                    queue.offer(new int[]{i,j,0});
+                    mapVisited[i][j] = true;
+                    bfs(mapVisited, queue, tempMap[i][j]);
+                }
+            }
+        }
+
+        return minCount;
+    }
+
+    private void bfs(boolean[][] mapVisited, Queue<int[]> queue, int start) {
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int count = curr[2];
+
+            for(int d=0; d<4; d++){
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+                if(nr>=0 && nr<n && nc>=0 && nc<n && !mapVisited[nr][nc]) {
+                    if(tempMap[nr][nc]==0){
+                        queue.offer(new int[]{nr, nc, count+1});
+                        mapVisited[nr][nc]=true;
+                    }
+                    else if(tempMap[nr][nc]!=start){
+                        minCount = Math.min(minCount, count);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private void dfs(int[][] map, int currI, int currJ, int num) {
+        visited[currI][currJ] = true;
+        tempMap[currI][currJ] = num;
+
+        for(int d=0; d<4; d++){
+            int nr = currI + dr[d];
+            int nc = currJ + dc[d];
+            if(nr>=0 && nr<n && nc>=0 && nc<n && !visited[nr][nc] && map[nr][nc]==1) {
+                dfs(map, nr, nc, num);
+            }
+        }
     }
 }
 

@@ -35,9 +35,59 @@ public class Main3 {
 }
 
 class Solution3 {
+    int n;
+    int m;
+    int l;
+    int[] dr = {-1,1,0,0,0,0};
+    int[] dc = {0,0,-1,1,0,0};
+    int[] dz = {0,0,0,0,-1,1};
+    boolean[][][] visited;
     public String solution(String[][] building) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = building.length;
+        m = building[0].length;
+        l = building[0][0].length();
+
+        char[][][] buildMap = new char[n][m][l];
+        Queue<int[]> queue = new LinkedList<>();
+        visited = new boolean[n][m][l];
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                for(int k=0; k<l; k++){
+                    buildMap[i][j][k] = building[i][j].charAt(k);
+                    if(buildMap[i][j][k]=='S') {
+                        queue.offer(new int[]{i,j,k,0});
+                        visited[i][j][k] = true;
+                    }
+                }
+            }
+        }
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int z = curr[2];
+            int cost = curr[3];
+
+            if(buildMap[r][c][z]=='E'){
+                return "Escaped in " + cost + " minute(s).";
+            }
+
+            for(int d=0; d<6; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+                int nz = z+dz[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<m && nz>=0 && nz<l && !visited[nr][nc][nz] && buildMap[nr][nc][nz]!='#'){
+                    queue.offer(new int[]{nr, nc, nz, cost+1});
+                    visited[nr][nc][nz] = true;
+                }
+            }
+        }
+
+
+        return "Trapped!";
     }
 }
 

@@ -34,9 +34,47 @@ public class Main4 {
 }
 
 class Solution4 {
+    List<Integer> answer;
+    int n;
     public int[] solution(int[] numbers) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = numbers.length;
+        answer = new ArrayList<>();
+        List<Integer>[] graph = new ArrayList[n+1];
+        for(int i=0; i<=n; i++){
+            graph[i] = new ArrayList<>();
+        }
+        for(int i=1; i<=n; i++){
+            graph[i].add(numbers[i-1]);
+        }
+
+        for(int i=1; i<=n; i++){
+            boolean[] visited = new boolean[n+1];
+            dfs(graph, visited, i, i);
+        }
+
+        int[] result = new int[answer.size()];
+        for(int i=0; i<answer.size(); i++){
+            result[i] = answer.get(i);
+        }
+        return result;
+    }
+
+    private void dfs(List<Integer>[] graph, boolean[] visited, int start, int current) {
+        // 이번 출발점에서 탐색하며 현재 숫자를 방문했다고 표시한다.
+        visited[current] = true;
+
+        for (int next : graph[current]) {
+            // 출발점으로 돌아오면 고리에 포함되는 숫자이다.
+            if(next==start){
+                answer.add(start);
+                return;
+            }
+
+            // 출발점은 유지하고, 아직 방문하지 않은 다음 숫자로 이동한다.
+            if(!visited[next]){
+                dfs(graph, visited, start, next);
+            }
+        }
     }
 }
 

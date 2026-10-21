@@ -1,7 +1,5 @@
 package daily.day20261020;
 
-import java.util.*;
-
 /*
 1. 방향에 따라 이어지는 판자
 
@@ -31,9 +29,44 @@ public class Main1 {
 }
 
 class Solution1 {
+    int count;
+    int n;
+    int m;
+    boolean[][] visited;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public int solution(String[] floor) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = floor.length;
+        m = floor[0].length();
+        visited = new boolean[n][m];
+        count=0;
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(!visited[i][j]){
+                    dfs(i, j, floor[i].charAt(j), floor);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private void dfs(int i, int j, char start, String[] floor) {
+        visited[i][j]=true;
+        int startD=0;
+        if(start=='-'){
+            startD=2;
+        }
+
+        for(int d=startD; d<startD+2; d++){
+            int nr = i+dr[d];
+            int nc = j+dc[d];
+
+            if(nr>=0 && nr<n && nc>=0 && nc<m && !visited[nr][nc] && start==floor[nr].charAt(nc)){
+                dfs(nr, nc, start, floor);
+            }
+        }
     }
 }
 
