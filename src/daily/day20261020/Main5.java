@@ -39,9 +39,69 @@ public class Main5 {
 }
 
 class Solution5 {
+    int count;
+    boolean[][] visited;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    boolean[][][] blocked;
     public int solution(int n, int[][] roads, int[][] cows) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        count=0;
+        blocked = new boolean[n][n][4];
+
+        for (int i = 0; i < cows.length; i++) {
+            int cowR = cows[i][0] - 1;
+            int cowC = cows[i][1] - 1;
+
+            bfs(cowR, cowC, roads, n);
+
+            for (int j = i + 1; j < cows.length; j++) {
+                int nextR = cows[j][0] - 1;
+                int nextC = cows[j][1] - 1;
+
+                if (!visited[nextR][nextC]) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    private void bfs(int cowR, int cowN, int[][] roads, int n) {
+        visited = new boolean[n][n];
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{cowR, cowN});
+        visited[cowR][cowN] = true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            for(int d=0; d<4; d++){
+                boolean crossRoad = false;
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                for (int[] road : roads) {
+                    int r1 = road[0] - 1;
+                    int c1 = road[1] - 1;
+                    int r2 = road[2] - 1;
+                    int c2 = road[3] - 1;
+
+                    if ((r == r1 && c == c1 && nr == r2 && nc == c2)
+                            || (r == r2 && c == c2 && nr == r1 && nc == c1)) {
+                        crossRoad = true;
+                        break;
+                    }
+                }
+                if(nr>=0 && nr<n && nc>=0 && nc<n && !visited[nr][nc] && !crossRoad){
+                    queue.offer(new int[]{nr, nc});
+                    visited[nr][nc] = true;
+                }
+            }
+        }
     }
 }
 

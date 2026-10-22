@@ -35,9 +35,66 @@ public class Main4 {
 }
 
 class Solution4 {
+    int n;
+    char[][] board;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public String solution(String[] hallway) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = hallway.length;
+        board = new char[n][n];
+        for (int i = 0; i < n; i++) {
+            board[i] = hallway[i].toCharArray();
+        }
+
+        return dfs(0) ? "YES" : "NO";
+    }
+
+    private boolean dfs(int count) {
+        // 장애물 3개를 놓은 뒤 모든 선생님의 시선을 검사한다.
+        if (count == 3) {
+            return check();
+        }
+
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (board[row][col] == 'X') {
+                    board[row][col] = 'O';
+                    boolean possible = dfs(count + 1);
+                    // 다른 배치를 검사할 수 있도록 원래 빈칸으로 복원한다.
+                    board[row][col] = 'X';
+
+                    if (possible) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean check() {
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (board[row][col] == 'T') {
+                    for (int d = 0; d < 4; d++) {
+                        int nr = row + dr[d];
+                        int nc = col + dc[d];
+
+                        while (nr >= 0 && nr < n && nc >= 0 && nc < n) {
+                            if (board[nr][nc] == 'O') {
+                                break;
+                            }
+                            if (board[nr][nc] == 'S') {
+                                return false;
+                            }
+                            nr += dr[d];
+                            nc += dc[d];
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 }
 
