@@ -1,5 +1,6 @@
 package daily.day20261022;
 
+import javax.lang.model.type.ArrayType;
 import java.util.*;
 
 /*
@@ -34,8 +35,49 @@ public class Main2 {
 
 class Solution2 {
     public int solution(int n, int[][] edges, int s, int t) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] edge : edges){
+            int u = edge[0];
+            int v = edge[1];
+            int w = edge[2];
+
+            graph.get(u).add(new int[]{v,w});
+            graph.get(v).add(new int[]{u,w});
+        }
+
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[s] = 0;
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1], b[1]));
+        pq.offer(new int[]{s,0});
+
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+            if(currStart==t){
+                return currCost;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                int nextCost = currCost + next[1];
+
+                if(dist[nextStart]>nextCost){
+                    dist[nextStart] = nextCost;
+                    pq.offer(new int[]{nextStart, nextCost});
+                }
+            }
+        }
+        return 0;
     }
 }
 

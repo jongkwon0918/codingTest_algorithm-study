@@ -37,8 +37,74 @@ public class Main4 {
 
 class Solution4 {
     public int solution(int n, int[][] passages, int[] friends) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+
+        for(int[] passage : passages){
+            int u = passage[0];
+            int v = passage[1];
+            int w = passage[2];
+
+            graph.get(u).add(new int[]{v,w});
+            graph.get(v).add(new int[]{u,w});
+        }
+
+        int[][] dist = new int[friends.length][n+1];
+        for(int i=0; i< friends.length; i++){
+            Arrays.fill(dist[i], Integer.MAX_VALUE);
+        }
+
+        for(int i=0; i<friends.length; i++){
+            PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1], b[1]));
+            pq.offer(new int[]{friends[i],0});
+            dist[i][friends[i]]=0;
+
+            dijkstra(pq, dist, i, graph);
+        }
+        int minCount = Integer.MAX_VALUE;
+        int minNum = 0;
+
+        for(int i=1; i<=n; i++){
+            int count=0;
+            for(int j=0; j<dist.length; j++){
+                count+=dist[j][i];
+            }
+
+            if(minCount>count){
+                minCount=count;
+                minNum=i;
+            } else if (minCount==count) {
+                minNum = Math.min(minNum, i);
+            }
+        }
+
+        return minNum;
+    }
+
+    private void dijkstra(PriorityQueue<int[]> pq, int[][] dist, int i, List<List<int[]>> graph) {
+
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(dist[i][currStart]<currCost){
+                continue;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                int nextCost = currCost + next[1];
+
+                if(dist[i][nextStart]>nextCost){
+                    pq.offer(new int[]{nextStart, nextCost});
+                    dist[i][nextStart] = nextCost;
+                }
+            }
+        }
+
     }
 }
 

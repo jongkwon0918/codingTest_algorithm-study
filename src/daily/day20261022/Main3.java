@@ -31,8 +31,31 @@ public class Main3 {
 
 class Solution3 {
     public int solution(int a, int b) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{a, 0});
+
+        Set<Integer> visited = new HashSet<>();
+        visited.add(a);
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int currNum = curr[0];
+            int count = curr[1];
+
+            if(currNum==b){
+                return count+1;
+            }
+
+            long[] nexts = {currNum * 2L, currNum * 10L +1};
+            for(long next : nexts){
+                if(!visited.contains((int)next) && next<=b){
+                    queue.offer(new int[]{(int)next, count+1});
+                    visited.add((int)next);
+                }
+            }
+        }
+
+        return -1;
     }
 }
 

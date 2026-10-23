@@ -34,9 +34,42 @@ public class Main1 {
 }
 
 class Solution1 {
+    int n;
+    int m;
+    int[][] map;
+    boolean[][] visited;
     public int[][] solution(int[][] connections) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = connections.length;
+        m = connections[0].length;
+
+        map = new int[n][m];
+
+        for(int i=0; i<n; i++){
+            map[i] = connections[i].clone();
+        }
+
+        for(int i=0; i<n; i++){
+            visited = new boolean[n][m];
+            for(int j=0; j<m; j++){
+                if(connections[i][j]==1){
+                    dfs(i, j, connections);
+                }
+            }
+
+        }
+
+        return map;
+    }
+
+    private void dfs(int origin, int curr, int[][] connections) {
+        visited[origin][curr] = true;
+        map[origin][curr] = 1;
+
+        for(int next=0; next<n; next++){
+            if(!visited[origin][next] && connections[curr][next]==1){
+                dfs(origin, next, connections);
+            }
+        }
     }
 }
 

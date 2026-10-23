@@ -46,9 +46,74 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    char[][] map;
+    int[] dr = {-1, 1, 0, 0, -1, -1, 1, 1, 0};
+    int[] dc = {0, 0, -1, 1, -1, 1, -1, 1, 0};
+
     public int solution(String[] maze) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = 8;
+        map = new char[n][n];
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                map[i][j]=maze[i].charAt(j);
+            }
+        }
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{7,0});
+
+
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            boolean[][] visited = new boolean[n][n];
+
+            for (int i = 0; i < size; i++) {
+                int[] curr = queue.poll();
+                int r = curr[0];
+                int c = curr[1];
+
+                if(map[r][c]=='#'){
+                    continue;
+                }
+
+                if (r == 0 && c == 7) {
+                    return 1;
+                }
+
+                for (int d = 0; d < 9; d++) {
+                    int nr = r + dr[d];
+                    int nc = c + dc[d];
+
+                    if (nr >= 0 && nr < n && nc >= 0 && nc < n && map[nr][nc] != '#' && !visited[nr][nc]) {
+                        queue.offer(new int[]{nr, nc});
+                        visited[nr][nc] = true;
+                    }
+                }
+            }
+            map = moveMap();
+        }
+
+        return 0;
+    }
+
+    private char[][] moveMap() {
+        char[][] tempMap = new char[n][n];
+
+        for(int i=0; i<n; i++) {
+            Arrays.fill(tempMap[i], '.');
+        }
+        for(int i=0; i<n-1; i++){
+            for(int j=0; j<n; j++){
+                if(map[i][j]=='#'){
+                    tempMap[i+1][j]='#';
+                }
+            }
+        }
+
+        return tempMap;
     }
 }
 
