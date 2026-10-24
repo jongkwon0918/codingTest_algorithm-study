@@ -41,9 +41,66 @@ public class Main3 {
 }
 
 class Solution3 {
+    char[][] map;
+    int n;
+    int m;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public int solution(String[] classroom, int[] start, int[] target) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = classroom.length;
+        m = classroom[0].length();
+        map = new char[n][m];
+        int[][] dist  = new int[n][m];
+        for(int i=0; i<n; i++){
+            Arrays.fill(dist[i], Integer.MAX_VALUE);
+        }
+
+        int startR = start[0] - 1;
+        int startC = start[1] - 1;
+        int targetR = target[0] - 1;
+        int targetC = target[1] - 1;
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[2],b[2]));
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                map[i][j] = classroom[i].charAt(j);
+            }
+        }
+        pq.offer(new int[]{startR,startC,0});
+        dist[startR][startC] = 0;
+
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int count = curr[2];
+
+            if(r==targetR && c==targetC){
+                return count;
+            }
+
+            if(dist[r][c]<count){
+                continue;
+            }
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+                int nextCost = count;
+                if(nr>=0 && nr<n && nc>=0 && nc<m){
+                    if(map[nr][nc]=='1' || map[nr][nc] == '#'){
+                        nextCost++;
+                    }
+
+                    if(dist[nr][nc]>nextCost){
+                        pq.offer(new int[]{nr, nc, nextCost});
+                        dist[nr][nc] = nextCost;
+                    }
+                }
+            }
+        }
+
+        return -1;
     }
 }
 

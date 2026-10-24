@@ -36,9 +36,39 @@ public class Main1 {
 }
 
 class Solution1 {
+    int n;
+    List<Integer> list;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public int solution(int[][] board) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n=5;
+        list = new ArrayList<>();
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                dfs(i, j, 0, board[i][j], board);
+            }
+        }
+
+        return list.size();
+    }
+
+    private void dfs(int r, int c, int numLength, int num, int[][] board) {
+        if(numLength==5){
+            if(!list.contains(num)){
+                list.add(num);
+            }
+            return;
+        }
+
+        for(int d=0; d<4; d++){
+            int nr = r+dr[d];
+            int nc = c+dc[d];
+            if(nr>=0 && nr<n && nc>=0 && nc<n){
+                dfs(nr, nc, numLength+1, num*10+board[nr][nc], board);
+            }
+        }
+
     }
 }
 

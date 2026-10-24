@@ -34,9 +34,61 @@ public class Main4 {
 }
 
 class Solution4 {
+    int maxHeight;
+    int n;
+    int m;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    boolean[][] visited;
     public int solution(int[][] wood) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = wood.length;
+        m = wood[0].length;
+        maxHeight = 0;
+        visited = new boolean[n][m];
+        dfs(0,0,0,wood);
+
+        return maxHeight;
     }
+
+    private void dfs(int r, int c, int sum, int[][] wood) {
+        if (c == m) {
+            r++;
+            c = 0;
+        }
+
+        if (r == n) {
+            maxHeight = Math.max(maxHeight, sum);
+            return;
+        }
+
+        if (!visited[r][c]) {
+            for(int d=0; d<2; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+    
+                if(nr>=0 && nr<n && nc>=0 && nc<m){
+                    for(int dd=2; dd<4; dd++){
+                        int nnr = r+dr[dd];
+                        int nnc = c+dc[dd];
+    
+                        if(nnr>=0 && nnr<n && nnc>=0 && nnc<m && !visited[nr][nc] && !visited[nnr][nnc]){
+                            int height = wood[r][c]*2 + wood[nr][nc] + wood[nnr][nnc];
+                            visited[r][c] = true;
+                            visited[nr][nc] = true;
+                            visited[nnr][nnc] = true;
+    
+                            dfs(r, c + 1, sum + height, wood);
+                            visited[r][c] = false;
+                            visited[nr][nc] = false;
+                            visited[nnr][nnc] = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        dfs(r, c + 1, sum, wood);
+    }
+
 }
 

@@ -39,9 +39,57 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int m;
+    int[] dr = {0,0,1,-1};
+    int[] dc = {1,-1,0,0};
+    boolean[][][] visited;
     public int solution(int[][] factory, int[] start, int[] target) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = factory.length;
+        m = factory[0].length;
+        visited = new boolean[n][m][5];
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{start[0]-1, start[1]-1, start[2]-1, 0});
+        visited[start[0]-1][start[1]-1][start[2]-1] = true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int arrow = curr[2];
+            int count = curr[3];
+
+            if(r==target[0]-1 && c==target[1]-1 && arrow==target[2]-1){
+                return count;
+            }
+
+            for(int i=1; i<4; i++){
+                int nr = r + dr[arrow]*i;
+                int nc = c + dc[arrow]*i;
+
+                if(nr>=0 && nr<n && nc>=0 && nc<m &&  factory[nr][nc] == 0){
+                    if(!visited[nr][nc][arrow]){
+                        visited[nr][nc][arrow] = true;
+                        queue.offer(new int[]{nr, nc, arrow, count + 1});
+                    }
+                } else{
+                    break;
+                }
+            }
+
+            int[] nextArrows = arrow < 2 ? new int[]{2, 3} : new int[]{0, 1};
+
+            for (int nextArrow : nextArrows) {
+                if (!visited[r][c][nextArrow]) {
+                    visited[r][c][nextArrow] = true;
+                    queue.offer(new int[]{r, c, nextArrow, count + 1});
+                }
+            }
+
+        }
+
+        return 0;
     }
 }
 

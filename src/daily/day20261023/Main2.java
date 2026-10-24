@@ -36,8 +36,57 @@ public class Main2 {
 
 class Solution2 {
     public int solution(int n, int[][] teleports, int start, int target) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<Integer>[] graph = new ArrayList[n+1];
+        for(int i=0; i<=n; i++){
+            graph[i] = new ArrayList<>();
+        }
+        for(int[] teleport : teleports){
+            int u = teleport[0];
+            int v = teleport[1];
+
+            graph[u].add(v);
+            graph[v].add(u);
+        }
+
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[start] = 0;
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1], b[1]));
+        pq.offer(new int[]{start, 0});
+
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(currStart==target){
+                return currCost;
+            }
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+
+            for(int next : graph[currStart]){
+                int teleportStart = next;
+                int teleportCost = currCost+1;
+
+                if(teleportStart>=1 && teleportStart<=n && dist[teleportStart]>teleportCost){
+                    pq.offer(new int[]{teleportStart, teleportCost});
+                    dist[teleportStart] = teleportCost;
+                }
+            }
+
+            int[] nexts = {currStart - 1, currStart + 1};
+            for (int next : nexts) {
+                if (next >= 1 && next <= n && dist[next] > currCost + 1) {
+                    pq.offer(new int[]{next, currCost + 1});
+                    dist[next] = currCost + 1;
+                }
+            }
+        }
+        return -1;
     }
 }
 
