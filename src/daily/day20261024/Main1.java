@@ -1,7 +1,5 @@
 package daily.day20261024;
 
-import java.util.*;
-
 /*
 1. 조건을 만족하는 숫자 선택
 
@@ -32,9 +30,27 @@ public class Main1 {
 }
 
 class Solution1 {
+    int n;
+    int count;
     public int solution(int[] numbers, int target) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = numbers.length;
+        count=0;
+
+        for(int i=0; i<n; i++){
+            dfs(i, numbers, target, numbers[i]);
+        }
+
+        return count;
+    }
+
+    private void dfs(int curr, int[] numbers, int target, int num) {
+        if(num==target){
+            count++;
+        }
+
+        for(int i=curr+1; i<n; i++){
+            dfs(i, numbers, target, num+numbers[i]);
+        }
     }
 }
 

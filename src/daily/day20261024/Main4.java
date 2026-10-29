@@ -41,9 +41,116 @@ public class Main4 {
 }
 
 class Solution4 {
+    int n;
+    int m;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    int minCount;
+    int[][] tempMap;
+    List<int[]> cameras;
     public int solution(int[][] office) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = office.length;
+        m = office[0].length;
+        minCount=n*m;
+        tempMap = new int[n][m];
+        cameras = new ArrayList<>();
+
+        for(int i=0; i<n; i++){
+            tempMap[i] = office[i].clone();
+            for(int j=0; j<m; j++){
+                if(office[i][j]!=0 && office[i][j]!=6){
+                    cameras.add(new int[]{i, j, office[i][j]});
+                }
+            }
+        }
+
+        dfs(0);
+
+        return minCount;
+    }
+
+    private void dfs(int index) {
+        if(index==cameras.size()){
+            int count = 0;
+
+            for(int i=0; i<n; i++){
+                for(int j=0; j<m; j++){
+                    if(tempMap[i][j]==0){
+                        count++;
+                    }
+                }
+            }
+            minCount = Math.min(minCount, count);
+            return;
+        }
+
+        int[] camera = cameras.get(index);
+        int r = camera[0];
+        int c = camera[1];
+        int type = camera[2];
+
+        for(int d=0; d<4; d++){
+            int[][] backupMap = new int[n][m];
+            for (int i = 0; i < n; i++) {
+                backupMap[i] = tempMap[i].clone();
+            }
+
+            if (type == 2) {
+                if (d < 2) {
+                    watch(r, c, 0);
+                    watch(r, c, 1);
+                } else {
+                    watch(r, c, 2);
+                    watch(r, c, 3);
+                }
+            }else if (type == 3){
+                if (d == 0) {
+                    watch(r, c, 0);
+                    watch(r, c, 3);
+                } else if (d == 1) {
+                    watch(r, c, 1);
+                    watch(r, c, 3);
+                } else if (d == 2) {
+                    watch(r, c, 1);
+                    watch(r, c, 2);
+                } else {
+                    watch(r, c, 0);
+                    watch(r, c, 2);
+                }
+            } else if (type == 4) {
+                for(int z=0; z<4; z++){
+                    if(z!=d){
+                        watch(r, c, z);
+                    }
+                }
+            } else if (type == 5) {
+                for(int z=0; z<4; z++){
+                    watch(r, c, z);
+                }
+            } else{watch(r, c, d);}
+
+            dfs(index+1);
+
+            tempMap = backupMap;
+        }
+    }
+
+    private void watch(int r, int c, int d) {
+        int nr = r + dr[d];
+        int nc = c + dc[d];
+
+        while (nr >= 0 && nr < n && nc >= 0 && nc < m) {
+            if (tempMap[nr][nc] == 6) {
+                break;
+            }
+
+            if (tempMap[nr][nc] == 0) {
+                tempMap[nr][nc] = -1;
+            }
+
+            nr += dr[d];
+            nc += dc[d];
+        }
     }
 }
 

@@ -40,8 +40,68 @@ public class Main3 {
 
 class Solution3 {
     public int[][] solution(int n, int[][] buses, int start, int target) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+
+        for(int[] bus : buses){
+            int u = bus[0];
+            int v = bus[1];
+            int w = bus[2];
+
+            graph.get(u).add(new int[]{v,w});
+        }
+
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[start] = 0;
+
+        int[] parent = new int[n+1];
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1], b[1]));
+        pq.offer(new int[]{start, 0});
+
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(currStart==target){
+                break;
+            }
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                int nextCost = currCost+next[1];
+
+                if(dist[nextStart]>nextCost){
+                    pq.offer(new int[]{nextStart, nextCost});
+                    dist[nextStart] = nextCost;
+                    parent[nextStart] = currStart;
+                }
+            }
+        }
+
+        List<Integer> list = new ArrayList<>();
+        int current = target;
+        while(current!=0){
+            list.add(current);
+            current = parent[current];
+        }
+
+        Collections.reverse(list);
+
+        int[] answer = new int[list.size()];
+        for(int i=0; i<list.size(); i++){
+            answer[i] = list.get(i);
+        }
+
+        return new int[][]{{dist[target], answer.length}, answer};
     }
 }
 

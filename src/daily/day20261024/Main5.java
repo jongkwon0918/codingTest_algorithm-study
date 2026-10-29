@@ -52,9 +52,124 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int m;
+    boolean[][] visited;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public int solution(String[] field) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = 12;
+        m = 6;
+        int time = -1;
+
+        visited = new boolean[n][m];
+
+        char[][] map = new char[n][m];
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                map[i][j] = field[i].charAt(j);
+            }
+        }
+
+        boolean next=true;
+        while(next){
+            time++;
+            visited = new boolean[n][m];
+            next=false;
+
+            for(int i=0; i<n; i++){
+                for(int j=0; j<m; j++) {
+                    if(!visited[i][j] && map[i][j]!='.'){
+                        boolean over = dfs(i,j, map[i][j], map);
+                        if(over){
+                            map = changMap(map, i, j);
+                            next = true;
+                        }
+                    }
+                }
+            }
+
+            moveMap(map);
+
+        }
+
+        return time;
+    }
+
+    private void moveMap(char[][] map) {
+        for(int c=0; c<m; c++){
+            int bottom = n-1;
+            for(int r=n-1; r>=0; r--){
+                if(map[r][c]!='.'){
+                    char color = map[r][c];
+                    map[r][c] = '.';
+                    map[bottom][c] = color;
+                    bottom--;
+                }
+            }
+        }
+    }
+
+    private char[][] changMap(char[][] map, int curri, int currj) {
+        char[][] tempMap = new char[n][m];
+        for(int i=0; i<n; i++){
+            tempMap[i] = map[i].clone();
+        }
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{curri, currj});
+        boolean[][] visited = new boolean[n][m];
+        visited[curri][currj] = true;
+        tempMap[curri][currj] = '.';
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<m && !visited[nr][nc] && map[curri][currj]==map[nr][nc]){
+                    queue.offer(new int[]{nr, nc});
+                    visited[nr][nc] = true;
+                    tempMap[nr][nc] = '.';
+                }
+            }
+        }
+
+        return tempMap;
+    }
+
+    private boolean dfs(int curri, int currj, char color, char[][] map) {
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{curri, currj});
+        visited[curri][currj] = true;
+        int count = 1;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<m && !visited[nr][nc] && map[nr][nc]==color){
+                    queue.offer(new int[]{nr, nc});
+                    visited[nr][nc] = true;
+                    count++;
+
+                    if(count>=4){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }
 

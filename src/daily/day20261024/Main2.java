@@ -33,9 +33,57 @@ public class Main2 {
 }
 
 class Solution2 {
+    int n;
+    int m;
+    char[][] map;
+    int maxTime;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public int solution(String[] island) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = island.length;
+        m = island[0].length();
+        maxTime = 0;
+        map = new char[n][m];
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                map[i][j] = island[i].charAt(j);
+            }
+        }
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++) {
+                if(map[i][j]=='L'){
+                    bfs(i,j);
+                }
+            }
+        }
+
+        return maxTime;
+    }
+
+    private void bfs(int i, int j) {
+        boolean[][] visited = new boolean[n][m];
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{i, j, 0});
+        visited[i][j] = true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int time = curr[2];
+
+            maxTime = Math.max(maxTime, time);
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                if(nr>=0 && nr<n && nc>=0 && nc<m && !visited[nr][nc] && map[nr][nc]=='L'){
+                    visited[nr][nc] = true;
+                    queue.offer(new int[]{nr, nc, time+1});
+                }
+            }
+        }
     }
 }
 
