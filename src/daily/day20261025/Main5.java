@@ -46,9 +46,81 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int[] dr = {-1, 1, 0, 0};
+    int[] dc = {0, 0, 1, -1};
+
     public int solution(int rows, int cols, int[][] sharks) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        Queue<int[]> queue = new LinkedList<>();
+        n = sharks.length;
+        int answer = 0;
+        int fishhook = 1;
+        int[][][] map = new int[rows+1][cols+1][];
+
+        for (int i = 0; i < n; i++) {
+            map[sharks[i][0]][sharks[i][1]] = new int[]{sharks[i][2],sharks[i][3],sharks[i][4]};
+        }
+
+        while(fishhook<=cols){
+            for (int i=1; i<=rows; i++) {
+                if (map[i][fishhook] != null) {
+                    answer += map[i][fishhook][2];
+                    map[i][fishhook] = null;
+                    break;
+                }
+            }
+
+            int[][][] nextMap = new int[rows+1][cols+1][];
+
+            for(int i=1; i<=rows; i++){
+                for(int j=1; j<=cols; j++){
+                    if(map[i][j]!=null){
+                        queue.offer(new int[]{i,j,map[i][j][0], map[i][j][1], map[i][j][2]});
+                    }
+                }
+            }
+
+            while(!queue.isEmpty()){
+                int[] curr = queue.poll();
+                int r = curr[0];
+                int c = curr[1];
+                int speed = curr[2];
+                int arrow = curr[3];
+                int size = curr[4];
+
+                int sharkSpeed = speed;
+
+                int nr=r;
+                int nc=c;
+
+                while(sharkSpeed>0){
+                    nr = r+dr[arrow-1];
+                    nc = c+dc[arrow-1];
+
+                    if(nr<1 || nr>rows || nc<1 || nc>cols){
+                        if(arrow==1 || arrow==3){
+                            arrow +=1;
+                        } else if (arrow==2 || arrow==4) {
+                            arrow -=1;
+                        }
+
+                        nr = r+dr[arrow-1];
+                        nc = c+dc[arrow-1];
+                    }
+                    r=nr;
+                    c=nc;
+
+                    sharkSpeed--;
+                }
+
+                if(nextMap[nr][nc]==null || nextMap[nr][nc][2]<size){
+                    nextMap[nr][nc] = new int[]{speed, arrow, size};
+                }
+            }
+            map = nextMap;
+            fishhook++;
+        }
+        return answer;
     }
 }
 

@@ -33,9 +33,55 @@ public class Main2 {
 }
 
 class Solution2 {
+    int minShip;
+    boolean[] visited;
     public int solution(int n, int[][] friendships) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<Integer>[] graph = new ArrayList[n+1];
+        minShip=n*n;
+
+        for(int i=0; i<n+1; i++){
+            graph[i] = new ArrayList<>();
+        }
+        for(int[] friendship : friendships){
+            int u = friendship[0];
+            int v = friendship[1];
+
+            graph[u].add(v);
+            graph[v].add(u);
+        }
+
+        Queue<int[]> queue = new LinkedList<>();
+        int answer = 0;
+        for(int i=1; i<n+1; i++){
+            visited = new boolean[n+1];
+            queue.offer(new int[]{i, 0});
+            visited[i] = true;
+            int ship = 0;
+
+            while(!queue.isEmpty()){
+                int[] curr = queue.poll();
+                int currStart = curr[0];
+                int currCost = curr[1];
+                ship += currCost;
+
+                for(int next : graph[currStart]){
+                    int nextStart = next;
+                    int nextCost = currCost + 1;
+
+                    if(!visited[nextStart]){
+                        queue.offer(new int[]{nextStart, nextCost});
+                        visited[nextStart] = true;
+                    }
+                }
+            }
+            if(ship<minShip){
+                minShip = ship;
+                answer = i;
+            }
+        }
+
+
+        return answer;
     }
 }
 

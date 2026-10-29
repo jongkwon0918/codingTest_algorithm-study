@@ -1,0 +1,197 @@
+package daily.day20261030.answers;
+
+import java.util.*;
+
+/*
+5. 블록 그룹을 골라 지우고 회전하기
+
+n*n 격자의 모든 칸에 처음에는 블록이 하나씩 놓여 있다.
+-1은 검은 블록, 0은 무지개 블록, 1부터 colors까지는 일반 블록의 색 번호다.
+상하좌우로 연결된 블록들로 그룹을 만든다. 그룹에는 일반 블록이 최소 하나 있어야 하고,
+일반 블록은 모두 같은 색이어야 한다. 무지개 블록은 몇 개든 포함할 수 있다.
+검은 블록은 포함할 수 없고, 그룹의 전체 블록 수는 최소2개여야 한다.
+한 색과 무지개를 통해 더 연결되는 블록이 있으면 모두 같은 그룹에 포함한다.
+무지개 블록 하나가 서로 다른 색의 후보 그룹에 각각 포함될 수 있다.
+
+각 그룹의 '기준 블록'은 그 그룹의 일반 블록 중 행이 가장 작은 블록이며,
+그런 블록이 여러 개면 열이 가장 작은 블록이다. 행·열은0부터 시작한다.
+다음 순서로 그룹 하나를 선택한다.
+1. 전체 블록 수가 가장 큰 그룹
+2. 동률이면 무지개 블록 수가 가장 많은 그룹
+3. 그래도 동률이면 기준 블록의 행이 가장 큰 그룹
+4. 그래도 동률이면 기준 블록의 열이 가장 큰 그룹
+기준 블록 자체는 위쪽·왼쪽에서 정하지만, 그룹끼리 비교할 때는 아래쪽·오른쪽을 우선한다.
+
+선택할 그룹이 있는 동안 아래 과정을 반복한다.
+1. 선택한 그룹 하나만 삭제하고, 블록 수가 B이면 B*B점을 얻는다.
+2. 중력: 일반·무지개 블록을 아래로 내린다. 검은 블록은 움직이지 않고 다른 블록도 통과할 수 없다.
+3. 격자 전체를 반시계 방향으로90도 회전한다. 검은 블록과 빈칸도 함께 회전한다.
+4. 다시 중력을 적용한다.
+선택 가능한 그룹이 없어지면 종료하고 총점을 반환하라.
+삭제 후 빈칸은 구현에서 -2 등 별도 값으로 구분한다. 0은 빈칸이 아니다.
+
+제한사항
+- 1 <= board.length = n <= 20, 모든 행의 길이는 n이다.
+- 1 <= colors <= 5
+- 초기 board의 값은 -1 이상 colors 이하이며 초기 빈칸은 없다.
+- 검은 블록은 중력에서는 고정이지만 회전 시에는 위치가 바뀐다.
+
+입출력 예시
+colors=1, board={{1,1},{1,1}} -> 16
+colors=2, board={{1,0},{2,-1}} -> 4
+크기2·무지개1인 두 후보 중 기준 행이 큰2색 그룹을 지운다.
+colors=2, board={{1,-1},{-1,2}} -> 0
+Main의 마지막5*5예제 -> 77
+*/
+public class Main5 {
+    public static void main(String[] args) {
+        Solution5 solution = new Solution5();
+        System.out.println(solution.solution(1,
+                new int[][]{{1,1},{1,1}})); // 16
+        System.out.println(solution.solution(2,
+                new int[][]{{1,0},{2,-1}})); // 4
+        System.out.println(solution.solution(2,
+                new int[][]{{1,-1},{-1,2}})); // 0
+        System.out.println(solution.solution(3, new int[][]{
+            {2,2,-1,3,1},
+            {3,3,2,0,-1},
+            {0,0,0,1,2},
+            {-1,3,1,3,2},
+            {0,3,2,2,1}
+        })); // 77
+    }
+}
+
+class Solution5 {
+    int n;
+    int[][] map;
+    int[] dr = {-1, 1, 0, 0};
+    int[] dc = {0, 0, -1, 1};
+
+    public int solution(int colors, int[][] board) {
+        n = board.length;
+        map = new int[n][n];
+        for (int r = 0; r < n; r++) {
+            map[r] = board[r].clone();
+        }
+
+        int answer = 0;
+        while (true) {
+            List<int[]> candidates = findGroups();
+            if (candidates.isEmpty()) {
+                return answer;
+            }
+
+            // {그룹 크기, 무지개 수, 기준 행, 기준 열}: 모두 큰 값 우선
+            candidates.sort((a, b) -> {
+                for (int i = 0; i < 4; i++) {
+                    if (a[i] != b[i]) {
+                        return Integer.compare(b[i], a[i]);
+                    }
+                }
+                return 0;
+            });
+
+            int[] selected = candidates.get(0);
+            List<int[]> blocks = bfs(selected[2], selected[3], new boolean[n][n]);
+            for (int[] block : blocks) {
+                map[block[0]][block[1]] = -2;
+            }
+            answer += blocks.size() * blocks.size();
+
+            gravity();
+            rotate();
+            gravity();
+        }
+    }
+
+    private List<int[]> findGroups() {
+        List<int[]> candidates = new ArrayList<>();
+        boolean[][] visited = new boolean[n][n];
+
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < n; c++) {
+                if (map[r][c] > 0 && !visited[r][c]) {
+                    List<int[]> blocks = bfs(r, c, visited);
+                    int rainbowCount = 0;
+                    int standardRow = r;
+                    int standardCol = c;
+
+                    for (int[] block : blocks) {
+                        int row = block[0];
+                        int col = block[1];
+                        if (map[row][col] == 0) {
+                            rainbowCount++;
+                            // 다른 색의 그룹에서도 무지개를 사용할 수 있다.
+                            visited[row][col] = false;
+                        } else if (row < standardRow
+                                || (row == standardRow && col < standardCol)) {
+                            standardRow = row;
+                            standardCol = col;
+                        }
+                    }
+
+                    if (blocks.size() >= 2) {
+                        candidates.add(new int[]{
+                                blocks.size(), rainbowCount, standardRow, standardCol});
+                    }
+                }
+            }
+        }
+        return candidates;
+    }
+
+    private List<int[]> bfs(int startRow, int startCol, boolean[][] visited) {
+        int color = map[startRow][startCol];
+        List<int[]> blocks = new ArrayList<>();
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{startRow, startCol});
+        visited[startRow][startCol] = true;
+
+        while (!queue.isEmpty()) {
+            int[] current = queue.poll();
+            int r = current[0];
+            int c = current[1];
+            blocks.add(current);
+
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+                if (nr >= 0 && nr < n && nc >= 0 && nc < n
+                        && !visited[nr][nc]
+                        && (map[nr][nc] == color || map[nr][nc] == 0)) {
+                    visited[nr][nc] = true;
+                    queue.offer(new int[]{nr, nc});
+                }
+            }
+        }
+        return blocks;
+    }
+
+    private void gravity() {
+        for (int c = 0; c < n; c++) {
+            int bottom = n - 1;
+            for (int r = n - 1; r >= 0; r--) {
+                if (map[r][c] == -1) {
+                    bottom = r - 1;
+                } else if (map[r][c] >= 0) {
+                    int color = map[r][c];
+                    map[r][c] = -2;
+                    map[bottom][c] = color;
+                    bottom--;
+                }
+            }
+        }
+    }
+
+    private void rotate() {
+        int[][] nextMap = new int[n][n];
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < n; c++) {
+                nextMap[n - 1 - c][r] = map[r][c];
+            }
+        }
+        map = nextMap;
+    }
+}
+

@@ -37,9 +37,58 @@ public class Main4 {
 }
 
 class Solution4 {
+    int n;
+    int m;
+    boolean[][][] visited;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+
     public String solution(int[][] castle, int limit) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n=castle.length;
+        m=castle[0].length;
+        visited = new boolean[n][m][2];
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{0,0,0,1});
+        visited[0][0][1] = true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int cost = curr[2];
+            int noWall = curr[3];
+
+            if(r==n-1 && c==m-1){
+                if(cost<=limit){
+                    return String.valueOf(cost);
+                }
+                break;
+            }
+
+            if(castle[r][c]==2){
+                noWall=0;
+            }
+
+            for(int d=0; d<4; d++){
+                int nr = r+dr[d];
+                int nc = c+dc[d];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && !visited[nr][nc][noWall]) {
+                    if(noWall==1){
+                        if(castle[nr][nc]!=1){
+                            queue.offer(new int[]{nr, nc, cost+1, noWall});
+                            visited[nr][nc][noWall] = true;
+                        }
+                    }else {
+                        queue.offer(new int[]{nr, nc, cost+1, noWall});
+                        visited[nr][nc][noWall] = true;
+                    }
+                }
+            }
+        }
+
+        return "Fail";
     }
 }
 
