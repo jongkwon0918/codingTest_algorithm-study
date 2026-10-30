@@ -38,9 +38,36 @@ public class Main2 {
 }
 
 class Solution2 {
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public String solution(int[] home, int[][] stores, int[] festival) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{home[0], home[1]});
+        boolean[] visited = new boolean[stores.length];
+
+        while(!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            int x1 = curr[0];
+            int y1 = curr[1];
+            int distance = Math.abs(x1 - festival[0]) + Math.abs(y1 - festival[1]);
+
+            if (distance<=1000) {
+                return "happy";
+            }
+
+            for (int d = 0; d < stores.length; d++) {
+                int nextX = stores[d][0];
+                int nextY = stores[d][1];
+
+                int nextDistance = Math.abs(x1 - nextX) + Math.abs(y1 - nextY);
+
+                if (!visited[d] && nextDistance<=1000) {
+                    visited[d] = true;
+                    queue.offer(new int[]{nextX, nextY});
+                }
+            }
+        }
+        return "sad";
     }
 }
 

@@ -44,8 +44,66 @@ public class Main3 {
 
 class Solution3 {
     public String[][] solution(int n, int[][] roads) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] road : roads){
+            int u = road[0];
+            int v = road[1];
+            int w = road[2];
+
+            graph.get(u).add(new int[]{v,w});
+            graph.get(v).add(new int[]{u,w});
+        }
+
+        String[][] answer = new String[n][n];
+
+        for(int i=1; i<=n; i++){
+            int[] first = new int[n+1];
+            PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1],b[1]));
+            pq.offer(new int[]{i,0});
+
+            int[] dist = new int[n+1];
+            Arrays.fill(dist, Integer.MAX_VALUE);
+            dist[i] = 0;
+
+            while(!pq.isEmpty()){
+                int[] curr = pq.poll();
+                int currStart = curr[0];
+                int currTime = curr[1];
+
+                if(dist[currStart]<currTime){
+                    continue;
+                }
+
+                for(int[] next : graph.get(currStart)){
+                    int nextStart = next[0];
+                    int nextTime = currTime + next[1];
+
+                    if(dist[nextStart]>nextTime){
+                        pq.offer(new int[]{nextStart, nextTime});
+                        dist[nextStart] = nextTime;
+                        if(currStart==i){
+                            first[nextStart] = nextStart;
+                        }else {
+                            first[nextStart] = first[currStart];
+                        }
+                    }
+                }
+            }
+
+            for(int j=1; j<=n; j++){
+                if(dist[j]==0 || dist[j]==Integer.MAX_VALUE){
+                    answer[i-1][j-1]="-";
+                }else {
+                    answer[i-1][j-1]=String.valueOf(first[j]);
+                }
+            }
+
+        }
+
+        return answer;
     }
 }
 

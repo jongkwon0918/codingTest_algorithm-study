@@ -32,9 +32,42 @@ public class Main1 {
 }
 
 class Solution1 {
+    List<int[]> list;
+    boolean[] visited;
+    int[] choice;
     public int[][] solution(int n, int m) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        list = new ArrayList<>();
+        visited = new boolean[n+1];
+        choice = new int[m];
+        for(int i=1; i<=n; i++){
+            choice[0]=i;
+            dfs(i, n, m, 1);
+            visited[i] = false;
+        }
+
+        int[][] answer = new int[list.size()][m];
+        for(int i=0; i<list.size(); i++){
+            answer[i] = list.get(i);
+        }
+
+        return answer;
+    }
+
+    private void dfs(int curr, int n, int m, int currLength) {
+        visited[curr]=true;
+
+        if(currLength==m){
+            list.add(choice.clone());
+            return;
+        }
+
+        for(int i=1; i<=n; i++){
+            if(!visited[i]){
+                choice[currLength] = i;
+                dfs(i, n, m, currLength+1);
+                visited[i]=false;
+            }
+        }
     }
 }
 
