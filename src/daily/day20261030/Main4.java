@@ -40,8 +40,50 @@ public class Main4 {
 
 class Solution4 {
     public int solution(int target) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        int maxCount = target*2;
+        boolean[][] visited = new boolean[maxCount+1][maxCount+1];
+        visited[1][0]=true;
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{1,0,0});
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int currStart = curr[0];
+            int clipboard = curr[1];
+            int currTime = curr[2];
+
+            if(currStart==target) return currTime;
+
+            int choose = 3;
+            while(choose>0){
+                if(choose==3) {
+                    if(!visited[currStart][currStart]){
+                        queue.offer(new int[]{currStart, currStart, currTime + 1});
+                        visited[currStart][currStart] = true;
+                    }
+                }
+                if(choose==2) {
+                    int nextStart = currStart + clipboard;
+                    if (clipboard > 0 && !visited[nextStart][clipboard]) {
+                        queue.offer(new int[]{nextStart, clipboard, currTime + 1});
+
+                    }
+                }
+                if(choose==1){
+                    int nextStart = currStart - 1;
+                    if (nextStart > 0 && !visited[nextStart][clipboard]) {
+                        queue.offer(new int[]{nextStart, clipboard, currTime + 1});
+                        visited[nextStart][clipboard] = true;
+                    }
+                }
+                choose--;
+            }
+
+
+
+        }
+
+        return -1;
     }
 }
 

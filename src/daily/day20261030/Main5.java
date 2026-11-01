@@ -63,9 +63,219 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    boolean[][] visited;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    List<List<int[]>> list;
     public int solution(int colors, int[][] board) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = board.length;
+
+        int score = 0;
+
+        while(true) {
+            visited = new boolean[n][n];
+            list = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (!visited[i][j] && board[i][j] > 0) {
+                        List<int[]> newList = new ArrayList<>();
+                        newList = dfs(i, j, board[i][j], newList, board);
+                        for (int n = 0; n < newList.size(); n++) {
+                            if(board[newList.get(n)[0]][newList.get(n)[1]]==0){
+                                visited[newList.get(n)[0]][newList.get(n)[1]] = false;
+                            }
+                        }
+                        list.add(newList);
+                    }
+                }
+            }
+
+            List<List<int[]>> maxSizelist = new ArrayList<>();
+            int maxSize = 0;
+            for (int i = 0; i < list.size(); i++) {
+                maxSize = Math.max(maxSize, list.get(i).size());
+            }
+            if (maxSize >= 2) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).size() == maxSize) {
+                        maxSizelist.add(list.get(i));
+                    }
+                }
+            } else {
+                return score;
+            }
+
+            if (maxSizelist.size() == 1) {
+                score += maxSize*maxSize;
+                board = clearAndMoveMap(maxSizelist, board);
+            } else{
+                int maxRainbowCnt = 0;
+                List<List<int[]>> maxRainbowList = new ArrayList<>();
+
+                for (int i = 0; i < maxSizelist.size(); i++) {
+                    int rainBowCnt = 0;
+                    for (int j = 0; j < maxSizelist.get(i).size(); j++) {
+                        int[] coord = maxSizelist.get(i).get(j);
+                        int r = coord[0];
+                        int c = coord[1];
+
+                        if (board[r][c] == 0) {
+                            rainBowCnt++;
+                        }
+                    }
+                    if(maxRainbowCnt<rainBowCnt){
+                        maxRainbowList.clear();
+                        maxRainbowCnt = rainBowCnt;
+                        maxRainbowList.add(maxSizelist.get(i));
+                    }else if(maxRainbowCnt==rainBowCnt) {
+                        maxRainbowList.add(maxSizelist.get(i));
+                    }
+                }
+
+                if (maxRainbowList.size() == 1) {
+                    score += maxSize*maxSize;
+                    board = clearAndMoveMap(maxRainbowList, board);
+                } else {
+                    int maxRow = 0;
+                    List<List<int[]>> maxRowList = new ArrayList<>();
+
+                    for (int i = 0; i < maxRainbowList.size(); i++) {
+                        int[] standard = findStandard(maxRainbowList.get(i), board);
+                        int row = standard[0];
+
+                        if(maxRow<row){
+                            maxRowList.clear();
+                            maxRow = row;
+                            maxRowList.add(maxRainbowList.get(i));
+                        }else if(maxRow==row) {
+                            maxRowList.add(maxRainbowList.get(i));
+                        }
+                    }
+
+                    if (maxRowList.size() == 1) {
+                        score += maxSize*maxSize;
+                        board = clearAndMoveMap(maxRowList, board);
+                    } else {
+                        int maxCol = 0;
+                        List<List<int[]>> maxCowList = new ArrayList<>();
+
+                        for (int i = 0; i < maxRowList.size(); i++) {
+                            int[] standard = findStandard(maxRowList.get(i), board);
+                            int col = standard[1];
+
+                            if(maxCol<col){
+                                maxCowList.clear();
+                                maxCol = col;
+                                maxCowList.add(maxRowList.get(i));
+                            }else if(maxCol==col) {
+                                maxCowList.add(maxRowList.get(i));
+                            }
+                        }
+
+                        score += maxSize*maxSize;
+                        board = clearAndMoveMap(maxCowList, board);
+                    }
+                }
+            }
+
+            board = reverseMap(board);
+            board = gravitation(board);
+
+        }
+    }
+
+    private int[][] reverseMap(int[][] board) {
+        int[][] tempMap = new int[n][n];
+
+        for(int r=0; r<n; r++){
+            for(int c=0; c<n; c++){
+                tempMap[n-1-c][r] = board[r][c];
+            }
+        }
+
+        return tempMap;
+    }
+
+    private int[] findStandard(List<int[]> findList, int[][] board) {
+        int standarRow = n;
+        int standarCol = n;
+
+        for(int[] coord : findList){
+            int r = coord[0];
+            int c = coord[1];
+
+            if(board[r][c]>0){
+                if(r<standarRow || (r==standarRow && c<standarCol)){
+                    standarRow = r;
+                    standarCol = c;
+                }
+            }
+        }
+        return new int[]{standarRow, standarCol};
+    }
+
+
+    private int[][] clearAndMoveMap(List<List<int[]>> deleteList, int[][] board) {
+        for(int j=0; j<deleteList.get(0).size(); j++){
+            board[deleteList.get(0).get(j)[0]][deleteList.get(0).get(j)[1]]=-2;
+        }
+
+        board = gravitation(board);
+
+        return board;
+    }
+
+    private int[][] gravitation(int[][] board) {
+        int[][] tempMap = new int[n][n];
+        for(int i=0; i<n; i++){
+            tempMap[i] = board[i].clone();
+        }
+        Queue<int[]> queue = new LinkedList<>();
+
+        for (int i = n-1; i >= 0; i--) {
+            for (int j = n-1; j >= 0; j--) {
+                if (board[i][j] >= 0) {
+                    queue.offer(new int[]{i,j});
+                }
+            }
+        }
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            boolean keepGoing = false;
+            int nr = r;
+            int nc = c;
+            while (!keepGoing) {
+                if(nr+dr[1]<n && tempMap[nr+dr[1]][nc]==-2){
+                    nr += dr[1];
+                }else keepGoing = true;
+            }
+            tempMap[r][c] = -2;
+            tempMap[nr][nc] = board[r][c];
+        }
+
+        return tempMap;
+    }
+
+    private List<int[]> dfs(int r, int c, int color, List<int[]> newList, int[][] board) {
+        visited[r][c] = true;
+        newList.add(new int[]{r,c});
+
+        for (int d = 0; d < 4; d++) {
+            int nr = r + dr[d];
+            int nc = c + dc[d];
+
+            if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
+                if(!visited[nr][nc] && (board[nr][nc]==0 || board[nr][nc]==color)){
+                    dfs(nr, nc, color, newList, board);
+                }
+            }
+        }
+        return newList;
     }
 }
 

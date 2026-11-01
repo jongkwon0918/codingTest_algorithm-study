@@ -1,0 +1,171 @@
+package daily.day20261101.answers;
+
+import java.util.*;
+
+/*
+5. 원형 숫자판을 돌리고 같은 수 지우기
+
+동심원 모양의 원판 n개가 있고 각 원판에는 m개의 숫자가 시계 방향으로 적혀 있다.
+disks[r][c]는 r+1번 원판의 c번째 위치에 적힌 수이다.
+원판 번호는1부터 n까지이며, 배열의 행 인덱스는0부터 n-1까지이다.
+각 원판에서 첫 위치와 마지막 위치는 서로 인접한다.
+서로 이웃한 원판에서도 같은 위치 번호의 숫자끼리 인접한다.
+가장 안쪽과 가장 바깥쪽 원판은 서로 이어지지 않는다. 대각선도 인접하지 않는다.
+
+commands[i]={x,d,k}를 입력 순서대로 적용한다.
+1. 원판 번호가 x의 배수인 원판만 d방향으로 k칸 회전시킨다.
+d=0은 시계 방향, d=1은 반시계 방향이다.
+예: {1,2,3,4}를 시계로1칸 돌리면{4,1,2,3}, 반시계로1칸이면{2,3,4,1}.
+숫자가 지워진 위치도 함께 회전하며, 다른 원판은 움직이지 않는다.
+2. 전체 원판에서 인접하면서 값이 같은 숫자들을 찾는다.
+그런 숫자가 하나라도 있으면 해당하는 모든 숫자를 동시에 지운다.
+없으면 남아 있는 모든 숫자의 평균을 구하여 평균보다 큰 수는1 빼고, 작은 수는1 더한다.
+평균과 같은 수는 유지한다. 평균은 정수로 버리지 않으며, 모든 비교는 조정 전 평균을 기준으로 한다.
+지워진 칸은 이웃을 비교할 때나 평균 계산에서 제외하고, 빈칸을 건너뛰어 이웃으로 보지 않는다.
+숫자가 하나도 없으면 삭제와 평균 조정을 건너뛴다.
+모든 명령을 적용한 뒤 남은 수의 합을 반환하라. 숫자를 아래로 떨어뜨리는 단계는 없다.
+
+제한사항
+- 2 <= disks.length = n <= 50
+- 2 <= disks[0].length = m <= 50, 모든 행의 길이는 같다.
+- 초기 숫자는1 이상1000 이하이며 초기 빈칸은 없다.
+- 1 <= commands.length <= 50
+- 2 <= x <= n, d는0 또는1, 1 <= k < m
+- 구현에서 지워진 칸을0으로 표시할 수 있다.
+
+입출력 예시
+disks={{1,1,1},{1,1,1}}, commands={{2,0,1}} -> 0
+모든 숫자가 같은 이웃을 가지므로 동시에 지워진다.
+disks={{1,2,3},{10,20,30}}, commands={{2,0,1}} -> 68
+회전 후{{1,2,3},{30,10,20}}이며 같은 이웃이 없다.
+평균11을 기준으로{{2,3,4},{29,11,19}}가 된다.
+Main의4*4예제에 명령{{2,0,1}}만 적용하면30,
+명령{{2,0,1},{3,1,3}}을 적용하면22이다.
+*/
+public class Main5 {
+    public static void main(String[] args) {
+        Solution5 solution = new Solution5();
+        System.out.println(solution.solution(
+                new int[][]{{1,1,1},{1,1,1}},
+                new int[][]{{2,0,1}})); // 0
+        System.out.println(solution.solution(
+                new int[][]{{1,2,3},{10,20,30}},
+                new int[][]{{2,0,1}})); // 68
+        int[][] disks = {
+            {1,1,2,3}, {5,2,4,2}, {3,1,3,5}, {2,1,3,2}
+        };
+        System.out.println(solution.solution(disks,
+                new int[][]{{2,0,1}})); // 30
+        System.out.println(solution.solution(disks,
+                new int[][]{{2,0,1},{3,1,3}})); // 22
+    }
+}
+
+class Solution5 {
+    int n;
+    int m;
+    int[][] map;
+
+    public int solution(int[][] disks, int[][] commands) {
+        n = disks.length;
+        m = disks[0].length;
+        map = new int[n][m];
+        for (int r = 0; r < n; r++) {
+            map[r] = disks[r].clone();
+        }
+
+        for (int[] command : commands) {
+            rotate(command[0], command[1], command[2]);
+            if (!removeSame()) {
+                adjustAverage();
+            }
+        }
+
+        int answer = 0;
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < m; c++) {
+                answer += map[r][c];
+            }
+        }
+        return answer;
+    }
+
+    private void rotate(int x, int direction, int count) {
+        for (int number = x; number <= n; number += x) {
+            int r = number - 1;
+            int[] next = new int[m];
+            for (int c = 0; c < m; c++) {
+                int nextCol;
+                if (direction == 0) {
+                    nextCol = (c + count) % m;
+                } else {
+                    nextCol = (c - count + m) % m;
+                }
+                next[nextCol] = map[r][c];
+            }
+            map[r] = next;
+        }
+    }
+
+    private boolean removeSame() {
+        boolean[][] remove = new boolean[n][m];
+        boolean found = false;
+
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < m; c++) {
+                if (map[r][c] > 0) {
+                    int right = (c + 1) % m;
+                    if (map[r][c] == map[r][right]) {
+                        remove[r][c] = true;
+                        remove[r][right] = true;
+                        found = true;
+                    }
+                    if (r + 1 < n && map[r][c] == map[r + 1][c]) {
+                        remove[r][c] = true;
+                        remove[r + 1][c] = true;
+                        found = true;
+                    }
+                }
+            }
+        }
+
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < m; c++) {
+                if (remove[r][c]) {
+                    map[r][c] = 0;
+                }
+            }
+        }
+        return found;
+    }
+
+    private void adjustAverage() {
+        int sum = 0;
+        int count = 0;
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < m; c++) {
+                if (map[r][c] > 0) {
+                    sum += map[r][c];
+                    count++;
+                }
+            }
+        }
+
+        if (count == 0) {
+            return;
+        }
+        double average = (double) sum / count;
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < m; c++) {
+                if (map[r][c] > 0) {
+                    if (map[r][c] > average) {
+                        map[r][c]--;
+                    } else if (map[r][c] < average) {
+                        map[r][c]++;
+                    }
+                }
+            }
+        }
+    }
+}
+
