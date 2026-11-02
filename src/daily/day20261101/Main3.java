@@ -1,5 +1,6 @@
 package daily.day20261101;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /*
@@ -43,8 +44,64 @@ public class Main3 {
 
 class Solution3 {
     public int solution(int n, int[] friends, int[][] roads) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] road : roads){
+            int u = road[0];
+            int v = road[1];
+            int w = road[2];
+
+            graph.get(u).add(new int[]{v,w});
+            graph.get(v).add(new int[]{u,w});
+        }
+
+        int[] distA = dijkstra(friends[0], n, graph);
+        int[] distB = dijkstra(friends[1], n, graph);
+        int[] distC = dijkstra(friends[2], n, graph);
+
+        int answerMaxCost = -1;
+        int answerMaxIdx = 1;
+        for(int i=1; i<=n; i++){
+            int minCost = Math.min(distA[i], Math.min(distB[i], distC[i]));
+            if(answerMaxCost<minCost){
+                answerMaxCost = minCost;
+                answerMaxIdx = i;
+            }
+        }
+
+        return answerMaxIdx;
+    }
+
+    private int[] dijkstra(int start, int n, List<List<int[]>> graph) {
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)-> Integer.compare(a[1], b[1]));
+        pq.offer(new int[]{start, 0});
+        dist[start]=0;
+
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                int nextCost = next[1] + currCost;
+
+                if(dist[nextStart]>nextCost){
+                    pq.offer(new int[]{nextStart, nextCost});
+                    dist[nextStart] = nextCost;
+                }
+            }
+        }
+        return dist;
     }
 }
 

@@ -40,9 +40,63 @@ public class Main4 {
 }
 
 class Solution4 {
+    int n;
+    int m;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+
     public int solution(String[] maze) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = maze.length;
+        m = maze[0].length();
+
+        boolean[][][] visited = new boolean[n][m][64];
+        char[][] map = new char[n][m];
+        Queue<int[]> queue = new LinkedList<>();
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++) {
+                map[i][j] = maze[i].charAt(j);
+                if(map[i][j]=='0'){
+                    queue.offer(new int[]{i,j,0,0});
+                    visited[i][j][0] = true;
+                }
+            }
+        }
+
+        while(!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int cost = curr[2];
+            int key = curr[3];
+
+            if (map[r][c] == '1') {
+                return cost;
+            }
+
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && map[nr][nc]!='#') {
+                    char nextChar = map[nr][nc];
+                    int nextKey = key;
+                    boolean canMove = true;
+
+                    if(nextChar >= 'A' && nextChar <= 'F'){
+                       canMove = (key & (1<<(nextChar - 'A'))) != 0;
+                    } else if (nextChar >= 'a' && nextChar <= 'f') {
+                        nextKey = key | (1<<(nextChar - 'a'));
+                    }
+
+                    if(canMove && !visited[nr][nc][nextKey]){
+                        queue.offer(new int[]{nr, nc, cost+1, nextKey});
+                        visited[nr][nc][nextKey] = true;
+                    }
+                }
+            }
+        }
+        return -1;
     }
 }
 

@@ -39,8 +39,44 @@ public class Main1 {
 
 class Solution1 {
     public int solution(int n, int[][] friendships) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i=-0; i<n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] friendship : friendships){
+            int u = friendship[0];
+            int v = friendship[1];
+
+            graph.get(u).add(v);
+            graph.get(v).add(u);
+        }
+
+        for(int i=0; i<n; i++){
+            boolean[] visited = new boolean[n];
+            boolean cycle = dfs(i, graph, n, visited, 1);
+            if(cycle) return 1;
+        }
+
+        return 0;
+    }
+
+    private boolean dfs(int i, List<List<Integer>> graph, int n, boolean[] visited, int num) {
+        visited[i]=true;
+
+        if(num==5){
+            return true;
+        }
+
+        for(int next : graph.get(i)){
+            if(!visited[next]){
+                if(dfs(next, graph, n, visited, num+1)){
+                    return true;
+                }
+            }
+        }
+
+        visited[i] = false;
+        return false;
     }
 }
 

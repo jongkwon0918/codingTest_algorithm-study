@@ -20,7 +20,10 @@ import java.util.*;
 입출력 예시
 sea={{1,0,0},{0,0,0},{0,0,0}} -> 2
 (2,2)에서 대각선으로 두 번 이동하면(0,0)에 도착한다.
-sea={{1,0,0},{0,0,0},{0,0,1}} -> 2
+sea={
+{1,0,0},
+{0,0,0},
+{0,0,1}} -> 2
 가운데의 안전 거리는1이지만(0,2)와(2,0)의 안전 거리는2다.
 sea={{1,0},{0,1}} -> 1
 */
@@ -40,9 +43,66 @@ public class Main2 {
 }
 
 class Solution2 {
+    int n;
+    int m;
+    int[] dr = {-1,1,0,0,-1,1,-1,1};
+    int[] dc = {0,0,-1,1,-1,1,1,-1};
     public int solution(int[][] sea) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = sea.length;
+        m = sea[0].length;
+        for(int i=0; i<n; i++) {
+            for (int j = 0; j < m; j++) {
+                if(sea[i][j]==1){
+                    sea[i][j]=-1;
+                }else{
+                    sea[i][j]=n*m;
+                }
+            }
+        }
+        for(int i=0; i<n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (sea[i][j] == -1) {
+                    sea = dfs(i,j,sea);
+                }
+            }
+        }
+        int safeZone = 0;
+        for(int i=0; i<n; i++) {
+            for (int j = 0; j < m; j++) {
+                if(sea[i][j]!=-1){
+                    safeZone = Math.max(safeZone, sea[i][j]);
+                }
+            }
+        }
+
+        return safeZone;
+    }
+
+    private int[][] dfs(int i, int j, int[][] sea) {
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{i,j,0});
+        boolean[][] visited = new boolean[n][m];
+        visited[i][j]=true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int cost = curr[2];
+
+            for(int d=0; d<8; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && !visited[nr][nc] && sea[nr][nc]>cost) {
+                    sea[nr][nc] = cost+1;
+                    queue.offer(new int[]{nr, nc, cost+1});
+                    visited[nr][nc] = true;
+                }
+            }
+        }
+
+        return sea;
     }
 }
 
