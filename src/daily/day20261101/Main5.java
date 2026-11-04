@@ -62,9 +62,117 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int m;
+    int[] dr = {-1, 1, 0, 0};
+    int[] dc = {0, 0, -1, 1};
+    boolean[][] visited;
+    List<List<int[]>> lists;
     public int solution(int[][] disks, int[][] commands) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = disks.length;
+        m = disks[0].length;
+
+        for(int[] command : commands){
+            int basu = command[0];
+            int clock = command[1];
+            int count = command[2];
+
+            for(int i=basu-1; i<n; i+=basu){
+                int cnt = count;
+                int[] disk = disks[i].clone();
+                while(0 < cnt){
+                    if(clock==0){
+                        disk[0] = disks[i][m-1];
+                        for(int j=1; j<m; j++){
+                            disk[j] = disks[i][j-1];
+                        }
+                    }else {
+                        disk[m-1] = disks[i][0];
+                        for(int j=0; j<m-1; j++){
+                            disk[j] = disks[i][j+1];
+                        }
+                    }
+                    cnt--;
+                    disks[i]=disk.clone();
+                }
+            }
+
+            visited = new boolean[n][m];
+            lists = new ArrayList<>();
+
+            for(int i=0; i<n; i++){
+                for(int j=0; j<m; j++){
+                    if(!visited[i][j] &&  disks[i][j]!=0){
+                        List<int[]> templist = new ArrayList<>();
+                        dfs(i, j, disks, templist, disks[i][j]);
+                        if(templist.size()>1){
+                            lists.add(templist);
+                        }
+                    }
+                }
+            }
+
+            if(lists.isEmpty()){
+                int avgNum = 0;
+                int avgCount = 0;
+                for(int i=0; i<n; i++) {
+                    for (int j = 0; j < m; j++) {
+                        if(disks[i][j]>0){
+                            avgNum+=disks[i][j];
+                            avgCount++;
+                        }
+                    }
+                }
+                if(avgCount!=0){
+                    double ang = (double) avgNum / avgCount;
+                    for(int i=0; i<n; i++) {
+                        for (int j = 0; j < m; j++) {
+                            if(disks[i][j]>0){
+                                if(ang>(double)disks[i][j]){
+                                    disks[i][j]+=1;
+                                } else if (ang<(double)disks[i][j]) {
+                                    disks[i][j]-=1;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else{
+                for(int l=0; l<lists.size(); l++){
+                    for(int[] list : lists.get(l)){
+                        disks[list[0]][list[1]] = 0;
+                    }
+                }
+            }
+        }
+
+        int answer = 0;
+        for(int i=0; i<n; i++) {
+            for (int j = 0; j < m; j++) {
+                if(disks[i][j]>0){
+                    answer+=disks[i][j];
+                }
+            }
+        }
+
+        return answer;
+    }
+
+    private void dfs(int curri, int currj, int[][] disks, List<int[]> templist, int num) {
+        visited[curri][currj] = true;
+        templist.add(new int[]{curri,currj});
+
+        for (int d = 0; d < 4; d++) {
+            int nr = curri + dr[d];
+            int nc = currj + dc[d];
+
+            nc = (nc + m) % m;
+            if (nr >= 0 && nr < n) {
+                if (!visited[nr][nc] && disks[nr][nc] == num) {
+                    dfs(nr, nc, disks, templist, num);
+                }
+            }
+        }
     }
 }
 
