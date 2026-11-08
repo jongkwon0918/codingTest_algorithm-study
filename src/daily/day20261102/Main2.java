@@ -35,9 +35,53 @@ public class Main2 {
 }
 
 class Solution2 {
+    int n;
+    int m;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    char[][] map;
+    boolean[][] visited;
     public String solution(String[] campus) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = campus.length;
+        m = campus[0].length();
+        map = new char[n][m];
+        Queue<int[]> queue = new LinkedList<>();
+        visited = new boolean[n][m];
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                map[i][j] = campus[i].charAt(j);
+                if(map[i][j]=='I'){
+                    queue.offer(new int[]{i,j});
+                    visited[i][j] = true;
+                }
+            }
+        }
+
+        int count = 0;
+
+        while (!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            if(map[r][c]=='P'){
+                count++;
+            }
+
+            for(int d=0; d<4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && !visited[nr][nc]) {
+                    if(map[nr][nc]!='X'){
+                        queue.offer(new int[]{nr,nc});
+                        visited[nr][nc] = true;
+                    }
+                }
+            }
+        }
+
+        return count>0 ? String.valueOf(count) :  "TT";
     }
 }
 

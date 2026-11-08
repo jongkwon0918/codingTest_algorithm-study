@@ -1,0 +1,153 @@
+package daily.day20261108.answers;
+
+import java.util.*;
+
+/*
+5. 물고기를 움직이고 다음 먹이를 고르기
+
+4*4공간의 각 칸에 물고기가 한 마리씩 있다.
+numbers[r][c]는 물고기 번호, directions[r][c]는 그 물고기의 방향이다.
+번호는1~16이 중복 없이 주어지고 방향은 다음과 같다.
+1=위, 2=왼쪽 위, 3=왼쪽, 4=왼쪽 아래,
+5=아래, 6=오른쪽 아래, 7=오른쪽, 8=오른쪽 위.
+행·열은0부터 시작하며, 두 배열의 같은 위치가 물고기 한 마리의 정보다.
+
+상어는(0,0)의 물고기를 먹고 그 위치에서 시작하며, 먹은 물고기의 방향을 갖는다.
+그다음 아래 과정을 반복한다.
+
+1. 살아 있는 물고기를 번호가 작은 순서대로 한 번씩 이동한다.
+현재 방향으로 한 칸 이동하려고 한다. 범위 밖이거나 상어가 있는 칸이면
+반시계 방향으로45도씩 회전하며 가능한 첫 방향을 찾는다.
+빈칸이면 그 칸으로 이동하고, 다른 물고기가 있으면 서로 자리를 바꾼다.
+물고기의 방향은 자신이 선택한 방향으로 갱신된다.
+자리가 바뀐 상대 물고기의 방향은 그대로이며, 그 물고기도 자기 번호 차례에 이동한다.
+어느 방향으로도 갈 수 없으면 제자리에 남는다.
+물고기는 동시에 움직이지 않는다.
+
+2. 모든 물고기 이동 후 상어가 현재 방향의 직선 위에서1칸 이상 이동할 목적지를 선택한다.
+빈칸을 지나갈 수 있지만 도착하는 칸에는 살아 있는 물고기가 있어야 한다.
+지나간 칸의 물고기는 먹지 않고, 도착 칸의 물고기 한 마리만 먹는다.
+상어의 위치와 방향은 도착 칸과 먹은 물고기의 방향으로 바뀐다.
+이동 가능한 목적지가 없으면 종료한다.
+상어가 먹은 물고기 번호의 합을 최대화하여 반환하라.
+(0,0)에서 처음 먹은 물고기도 합에 포함한다.
+
+제한사항
+- numbers와 directions는 각각4행4열이다.
+- numbers에는1부터16까지 정확히 한 번씩 등장한다.
+- directions의 값은1 이상8 이하이다.
+- 원본 입력의 {물고기 번호,방향} 쌍을 두 배열로 나누어 전달한다.
+
+입출력 예시
+numbers={{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16}},
+directions의 모든 값이1 -> 1
+처음1번을 먹고 위를 보지만(0,0)위로 갈 수 없어 종료한다.
+Main의 두 번째 예제 -> 33
+Main의 세 번째 예제 -> 43
+두 예제는 원본 예제의 번호와 방향을 배열 두 개로 분리한 것이다.
+*/
+public class Main5 {
+    public static void main(String[] args) {
+        Solution5 solution = new Solution5();
+        int[][] straight = {
+            {1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16}
+        };
+        int[][] up = new int[4][4];
+        for (int r = 0; r < 4; r++) {
+            Arrays.fill(up[r], 1);
+        }
+        System.out.println(solution.solution(straight, up)); // 1
+
+        System.out.println(solution.solution(new int[][]{
+            {7,2,15,9},{3,1,14,10},{6,13,4,11},{16,8,5,12}
+        }, new int[][]{
+            {6,3,6,8},{1,8,7,1},{1,6,3,4},{1,7,2,2}
+        })); // 33
+
+        System.out.println(solution.solution(new int[][]{
+            {16,1,4,12},{14,7,3,10},{5,15,8,6},{11,2,13,9}
+        }, new int[][]{
+            {7,4,3,8},{7,6,4,2},{2,2,3,4},{8,4,5,4}
+        })); // 43
+    }
+}
+
+class Solution5 {
+    int answer;
+    int[] dr = {-1, -1, 0, 1, 1, 1, 0, -1};
+    int[] dc = {0, -1, -1, -1, 0, 1, 1, 1};
+
+    public int solution(int[][] numbers, int[][] directions) {
+        answer = 0;
+        dfs(0, 0, 0, numbers, directions);
+        return answer;
+    }
+
+    private void dfs(int sharkRow, int sharkCol, int sum,
+                     int[][] numbers, int[][] directions) {
+        // 각 선택은 자기 판에서 진행하여 다른 선택의 상태와 섞이지 않게 한다.
+        int[][] map = copy(numbers);
+        int[][] dirs = copy(directions);
+
+        sum += map[sharkRow][sharkCol];
+        int sharkDirection = dirs[sharkRow][sharkCol] - 1;
+        map[sharkRow][sharkCol] = 0;
+        answer = Math.max(answer, sum);
+
+        moveFish(map, dirs, sharkRow, sharkCol);
+
+        for (int step = 1; step <= 3; step++) {
+            int nr = sharkRow + dr[sharkDirection] * step;
+            int nc = sharkCol + dc[sharkDirection] * step;
+            if (nr >= 0 && nr < 4 && nc >= 0 && nc < 4
+                    && map[nr][nc] > 0) {
+                dfs(nr, nc, sum, map, dirs);
+            }
+        }
+    }
+
+    private void moveFish(int[][] map, int[][] dirs, int sharkRow, int sharkCol) {
+        for (int number = 1; number <= 16; number++) {
+            int r = -1;
+            int c = -1;
+            for (int row = 0; row < 4; row++) {
+                for (int col = 0; col < 4; col++) {
+                    if (map[row][col] == number) {
+                        r = row;
+                        c = col;
+                    }
+                }
+            }
+
+            // 이미 먹힌 물고기는 이동하지 않는다.
+            if (r == -1) {
+                continue;
+            }
+
+            int direction = dirs[r][c] - 1;
+            for (int turn = 0; turn < 8; turn++) {
+                int nextDirection = (direction + turn) % 8;
+                int nr = r + dr[nextDirection];
+                int nc = c + dc[nextDirection];
+                if (nr >= 0 && nr < 4 && nc >= 0 && nc < 4
+                        && !(nr == sharkRow && nc == sharkCol)) {
+                    // 상대 번호와 방향을 원래 칸으로 옮긴 뒤, 현재 물고기를 목적지에 둔다.
+                    map[r][c] = map[nr][nc];
+                    dirs[r][c] = dirs[nr][nc];
+                    map[nr][nc] = number;
+                    dirs[nr][nc] = nextDirection + 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    private int[][] copy(int[][] source) {
+        int[][] result = new int[4][4];
+        for (int r = 0; r < 4; r++) {
+            result[r] = source[r].clone();
+        }
+        return result;
+    }
+}
+

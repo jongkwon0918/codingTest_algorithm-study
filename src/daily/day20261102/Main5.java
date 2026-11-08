@@ -43,7 +43,7 @@ pieces[i]={행,열,방향}은 i+1번 말의 초기 정보다.
 public class Main5 {
     public static void main(String[] args) {
         Solution5 solution = new Solution5();
-        int[][] pieces = {{2,1,1},{2,2,1},{2,3,1},{2,4,1}};
+        int[][] pieces = {{2, 1, 1}, {2, 2, 1}, {2, 3, 1}, {2, 4, 1}};
         System.out.println(solution.solution(new int[4][4], pieces)); // 1
 
         int[][] blue = new int[4][4];
@@ -59,9 +59,107 @@ public class Main5 {
 }
 
 class Solution5 {
+    int n;
+    int m;
+    int[] dr = {0, 0, -1, 1};
+    int[] dc = {1, -1, 0, 0};
+
+    List<Integer>[][] map;
+
     public int solution(int[][] colors, int[][] pieces) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = colors.length;
+        m = pieces.length;
+        map = new List[n][n];
+
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < n; c++) {
+                map[r][c] = new ArrayList<>();
+            }
+        }
+
+        for (int i = 0; i < m; i++) {
+            int r = pieces[i][0] - 1;
+            int c = pieces[i][1] - 1;
+            map[r][c].add(i);
+        }
+
+        return movePiece(pieces, colors);
+    }
+
+    private int movePiece(int[][] pieces, int[][] colors) {
+        int count = 1;
+        while (true) {
+            if (count == 1001) {
+                return -1;
+            }
+            for (int i = 0; i < m; i++) {
+                int r = pieces[i][0] - 1;
+                int c = pieces[i][1] - 1;
+                int d = pieces[i][2] - 1;
+
+                List<Integer> temp = new ArrayList<>();
+                boolean getList = false;
+                for (int t = 0; t < map[r][c].size(); t++) {
+                    if (map[r][c].get(t).equals(i)) {
+                        getList = true;
+                    }
+                    if (getList) {
+                        temp.add(map[r][c].get(t));
+                    }
+                }
+
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if ((nr < 0 || nr >= n || nc < 0 || nc >= n) || colors[nr][nc] == 2) {
+                    if (d == 0 || d == 2) {
+                        nr = r + dr[d + 1];
+                        nc = c + dc[d + 1];
+                    } else {
+                        nr = r + dr[d - 1];
+                        nc = c + dc[d - 1];
+                    }
+
+                    if ((nr < 0 || nr >= n || nc < 0 || nc >= n) || colors[nr][nc] == 2) {
+                        continue;
+                    }
+                }
+
+
+                for (int number : temp) {
+                    map[r][c].remove(Integer.valueOf(number));
+                }
+
+                if (colors[nr][nc] == 0) {
+                    map[nr][nc].addAll(temp);
+                } else if (colors[nr][nc] == 1) {
+                    if (map[nr][nc].isEmpty()) {
+                        map[nr][nc].addAll(temp);
+                    } else {
+                        if (map[nr][nc].isEmpty()) {
+                            map[nr][nc].addAll(temp);
+                        } else {
+                            for (int j = temp.size() - 1; j >= 0; j--) {
+                                map[nr][nc].add(temp.get(j));
+                            }
+                        }
+                    }
+                }
+
+                for (int number : temp) {
+                    pieces[number][0] = nr + 1;
+                    pieces[number][1] = nc + 1;
+                }
+
+                if (map[nr][nc].size() >= 4) {
+                    return count;
+                }
+
+            }
+
+            count++;
+        }
+
     }
 }
 

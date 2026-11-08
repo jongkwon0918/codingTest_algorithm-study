@@ -40,9 +40,46 @@ public class Main4 {
 }
 
 class Solution4 {
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    int n;
+    int m;
+    int maxSize;
+    boolean[][] visited;
     public int solution(int[][] board) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = board.length;
+        m = board[0].length;
+        maxSize =0;
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(board[i][j]==0){
+                    visited = new boolean[n][m];
+                    int size = dfs(i,j, board);
+
+                    maxSize = Math.max(maxSize, size);
+                }
+            }
+        }
+
+        return maxSize;
+    }
+
+    private int dfs(int i, int j, int[][] board) {
+        visited[i][j] = true;
+        int count = 1;
+        for (int d = 0; d < 4; d++) {
+            int nr = i + dr[d];
+            int nc = j + dc[d];
+
+            if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
+                if(!visited[nr][nc] && board[nr][nc]==1){
+                    count += dfs(nr, nc, board);
+                }
+            }
+        }
+
+        return count;
     }
 }
 

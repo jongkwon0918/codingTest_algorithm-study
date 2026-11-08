@@ -44,8 +44,57 @@ public class Main3 {
 
 class Solution3 {
     public int[] solution(int n, int[][] roads, int x, int y, int z) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] road : roads){
+            int u = road[0];
+            int v = road[1];
+            int w = road[2];
+
+            graph.get(u).add(new int[]{v,w});
+        }
+
+        int[] distForm = dijkstra(x,z,n,graph,0);
+        int[] distFormY = dijkstra(y,z,n,graph,0);
+        int[] distFormNotY = dijkstra(x,z,n,graph,y);
+
+        return new int[]{((distForm[y]!=Integer.MAX_VALUE && distFormY[z]!=Integer.MAX_VALUE)? distForm[y]+distFormY[z]:-1), (distFormNotY[z]!=Integer.MAX_VALUE?distFormNotY[z]:-1)};
+    }
+
+    private int[] dijkstra(int start, int end, int n, List<List<int[]>> graph, int notY) {
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[start] = 0;
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1],b[1]));
+        pq.offer(new int[]{start, 0});
+
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currLength = curr[1];
+
+            if(dist[currStart]<currLength){
+                continue;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                int nextLength = currLength + next[1];
+
+                if(notY!=0 && nextStart==notY){
+                    continue;
+                }
+
+                if(dist[nextStart]>nextLength){
+                    dist[nextStart] = nextLength;
+                    pq.offer(new int[]{nextStart, nextLength});
+                }
+            }
+        }
+        return dist;
     }
 }
 
