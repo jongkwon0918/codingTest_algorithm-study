@@ -35,9 +35,40 @@ public class Main1 {
 }
 
 class Solution1 {
+    List<int[]> list;
+    int n;
+    int[] numbers;
     public int[][] solution(int[] numbers, int m) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        this.numbers = numbers.clone();
+        list = new ArrayList<>();
+        n = numbers.length;
+        Arrays.sort(this.numbers);
+        for(int i=0; i<n; i++){
+            int[] tempList = new int[m];
+            dfs(i, 0, m, tempList);
+        }
+
+
+        int[][] answer = new int[list.size()][m];
+        for(int i=0; i<list.size(); i++){
+            for(int j=0; j<m; j++){
+                answer[i][j] = list.get(i)[j];
+            }
+        }
+
+        return answer;
+    }
+
+    private void dfs(int start, int index, int m, int[] tempList) {
+        tempList[index]=numbers[start];
+        if (index==m-1){
+            list.add(tempList.clone());
+            return;
+        }
+
+        for(int i=start; i<n; i++){
+            dfs(i, index+1, m, tempList);
+        }
     }
 }
 

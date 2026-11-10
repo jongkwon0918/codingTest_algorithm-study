@@ -49,8 +49,70 @@ public class Main3 {
 
 class Solution3 {
     public int solution(int n, int[][] roads, int[] burgers, int burgerLimit, int[] coffees, int coffeeLimit) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] road : roads){
+            int u = road[0];
+            int v = road[1];
+            int w = road[2];
+
+            graph.get(u).add(new int[]{v,w});
+            graph.get(v).add(new int[]{u,w});
+        }
+
+        int[] burgerDist = new int[n+1];
+        Arrays.fill(burgerDist, Integer.MAX_VALUE);
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->Integer.compare(a[1], b[1]));
+        for (int start : burgers) {
+            burgerDist[start] = 0;
+            pq.offer(new int[]{start, 0});
+        }
+
+        dijkstra(pq, burgerDist, graph, burgerLimit);
+
+        int[] coffeeDist = new int[n+1];
+        Arrays.fill(coffeeDist, Integer.MAX_VALUE);
+        pq = new PriorityQueue<>((a,b)->Integer.compare(a[1], b[1]));
+        for (int start : coffees) {
+            coffeeDist[start] = 0;
+            pq.offer(new int[]{start, 0});
+        }
+
+        dijkstra(pq, coffeeDist, graph, coffeeLimit);
+
+        int answer = Integer.MAX_VALUE;
+
+        for(int i=0; i<=n; i++){
+            if(burgerDist[i]==Integer.MAX_VALUE || coffeeDist[i]==Integer.MAX_VALUE || burgerDist[i]==0 || coffeeDist[i]==0){
+                continue;
+            }
+            answer = Math.min(answer, burgerDist[i]+coffeeDist[i]);
+        }
+
+        return answer==Integer.MAX_VALUE?-1:answer;
+    }
+    private void dijkstra(PriorityQueue<int[]> pq, int[] dist, List<List<int[]>> graph, int limit) {
+        while(!pq.isEmpty()){
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(dist[currStart]<currCost){
+                continue;
+            }
+
+            for(int[] next : graph.get(currStart)){
+                int nextStart = next[0];
+                int nextCost = next[1]+currCost;
+
+                if(nextCost < dist[nextStart] && nextCost<=limit){
+                    pq.offer(new int[]{nextStart, nextCost});
+                    dist[nextStart]=nextCost;
+                }
+            }
+        }
     }
 }
 

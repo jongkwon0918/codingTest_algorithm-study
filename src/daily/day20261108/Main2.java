@@ -21,7 +21,9 @@ import java.util.*;
 - 양과 늑대는 모두 마당 안의 닫힌 영역에 존재한다.
 
 입출력 예시
-yard={"#######","#oov#v#","#######"} -> {2,1}
+yard={"#######",
+      "#oov#v#",
+      "#######"} -> {2,1}
 왼쪽은 양2·늑대1이므로 양2마리, 오른쪽은 늑대1마리가 살아남는다.
 yard={"#####","#ov.#","#####"} -> {0,1}
 같은 수면 늑대가 살아남는다.
@@ -43,9 +45,73 @@ public class Main2 {
 }
 
 class Solution2 {
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    int n;
+    int m;
+    boolean[][] visited;
+    char[][] map;
+    int sheepCnt;
+    int wolfCnt;
     public int[] solution(String[] yard) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = yard.length;
+        m = yard[0].length();
+        visited = new boolean[n][m];
+        sheepCnt=0;
+        wolfCnt=0;
+        map = new char[n][m];
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++) {
+                map[i][j] = yard[i].charAt(j);
+            }
+        }
+
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++) {
+                if(map[i][j]!='#' && !visited[i][j]){
+                    bfs(i,j);
+                }
+            }
+        }
+
+        return new int[]{sheepCnt, wolfCnt};
+    }
+
+    private void bfs(int curri, int currj) {
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{curri, currj});
+        visited[curri][currj] = true;
+        List<int[]> wolfList = new ArrayList<>();
+        List<int[]> sheepList = new ArrayList<>();
+
+        while(!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            if(map[r][c]=='o'){
+                sheepList.add(new int[]{r, c});
+            }else if(map[r][c]=='v'){
+                wolfList.add(new int[]{r, c});
+            }
+
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if(nr >= 0 && nr < n && nc >= 0 && nc < m && map[nr][nc]!='#' && !visited[nr][nc]){
+                    queue.offer(new int[]{nr,nc});
+                    visited[nr][nc]=true;
+                }
+
+            }
+        }
+
+        if(wolfList.size()<sheepList.size()){
+            sheepCnt+=sheepList.size();
+        }else {
+            wolfCnt+=wolfList.size();
+        }
     }
 }
 
