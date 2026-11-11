@@ -40,8 +40,49 @@ public class Main4 {
 
 class Solution4 {
     public String solution(int start, int limit, int goal) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        int max = 100000;
+
+        if(start==goal){
+            return "0";
+        }
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{start, 0});
+
+        boolean[] visited = new boolean[max];
+        visited[start]=true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int currPoint = curr[0];
+            int currCost = curr[1];
+
+            if(currPoint==goal){
+                return String.valueOf(currCost);
+            }
+
+            int[] nexts = {currPoint+1, currPoint*2};
+            for(int next=0; next<2; next++){
+                if(nexts[next]<max && currCost+1<=limit){
+                    if(next==1 && nexts[next]>0){
+                        String next2 = String.valueOf(nexts[next]);
+                        int newNext = (next2.charAt(0)-'0')-1;
+                        for(int i=1; i<next2.length(); i++){
+                            newNext = newNext*10+(next2.charAt(i)-'0');
+                        }
+                        nexts[next] = newNext;
+                    }
+
+                    if(!visited[nexts[next]]){
+                        queue.offer(new int[]{nexts[next], currCost+1});
+                        visited[nexts[next]]=true;
+                    }
+                }
+            }
+
+        }
+
+        return "ANG";
     }
 }
 

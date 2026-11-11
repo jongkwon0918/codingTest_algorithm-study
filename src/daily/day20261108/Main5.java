@@ -8,8 +8,7 @@ import java.util.*;
 4*4공간의 각 칸에 물고기가 한 마리씩 있다.
 numbers[r][c]는 물고기 번호, directions[r][c]는 그 물고기의 방향이다.
 번호는1~16이 중복 없이 주어지고 방향은 다음과 같다.
-1=위, 2=왼쪽 위, 3=왼쪽, 4=왼쪽 아래,
-5=아래, 6=오른쪽 아래, 7=오른쪽, 8=오른쪽 위.
+1=위, 2=왼쪽 위, 3=왼쪽, 4=왼쪽 아래, 5=아래, 6=오른쪽 아래, 7=오른쪽, 8=오른쪽 위.
 행·열은0부터 시작하며, 두 배열의 같은 위치가 물고기 한 마리의 정보다.
 
 상어는(0,0)의 물고기를 먹고 그 위치에서 시작하며, 먹은 물고기의 방향을 갖는다.
@@ -46,11 +45,12 @@ Main의 두 번째 예제 -> 33
 Main의 세 번째 예제 -> 43
 두 예제는 원본 예제의 번호와 방향을 배열 두 개로 분리한 것이다.
 */
+
 public class Main5 {
     public static void main(String[] args) {
         Solution5 solution = new Solution5();
         int[][] straight = {
-            {1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16}
+                {1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}
         };
         int[][] up = new int[4][4];
         for (int r = 0; r < 4; r++) {
@@ -59,23 +59,91 @@ public class Main5 {
         System.out.println(solution.solution(straight, up)); // 1
 
         System.out.println(solution.solution(new int[][]{
-            {7,2,15,9},{3,1,14,10},{6,13,4,11},{16,8,5,12}
+                {7, 2, 15, 9}, {3, 1, 14, 10}, {6, 13, 4, 11}, {16, 8, 5, 12}
         }, new int[][]{
-            {6,3,6,8},{1,8,7,1},{1,6,3,4},{1,7,2,2}
+                {6, 3, 6, 8}, {1, 8, 7, 1}, {1, 6, 3, 4}, {1, 7, 2, 2}
         })); // 33
 
         System.out.println(solution.solution(new int[][]{
-            {16,1,4,12},{14,7,3,10},{5,15,8,6},{11,2,13,9}
+                {16, 1, 4, 12}, {14, 7, 3, 10}, {5, 15, 8, 6}, {11, 2, 13, 9}
         }, new int[][]{
-            {7,4,3,8},{7,6,4,2},{2,2,3,4},{8,4,5,4}
+                {7, 4, 3, 8}, {7, 6, 4, 2}, {2, 2, 3, 4}, {8, 4, 5, 4}
         })); // 43
     }
 }
 
 class Solution5 {
+    int n;
+    int[] dr = {-1, -1, 0, 1, 1, 1, 0, -1};
+    int[] dc = {0, -1, -1, -1, 0, 1, 1, 1};
+    int maxSharkEat;
+
     public int solution(int[][] numbers, int[][] directions) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = 4;
+        maxSharkEat = 0;
+        dfs(numbers, directions, 0, 0, 0);
+
+        return maxSharkEat;
+    }
+
+    private void dfs(int[][] numbers, int[][] directions, int sharkR, int sharkC, int sum) {
+        int[][] tempNumbers = new int[n][n];
+        int[][] tempDirections = new int[n][n];
+
+        for (int i = 0; i < n; i++) {
+            tempNumbers[i] = numbers[i].clone();
+            tempDirections[i] = directions[i].clone();
+        }
+
+        sum += tempNumbers[sharkR][sharkC];
+        int sharkDirection = tempDirections[sharkR][sharkC] - 1;
+        tempNumbers[sharkR][sharkC] = 0;
+        maxSharkEat = Math.max(maxSharkEat, sum);
+
+        for (int number = 1; number <= 16; number++) {
+            moveFish(tempNumbers, tempDirections, number, sharkR, sharkC);
+        }
+
+        for (int step = 1; step < n; step++) {
+            int nr = sharkR + dr[sharkDirection] * step;
+            int nc = sharkC + dc[sharkDirection] * step;
+            if (nr >= 0 && nr < n && nc >= 0 && nc < n && tempNumbers[nr][nc] > 0) {
+                dfs(tempNumbers, tempDirections, nr, nc, sum);
+            }
+        }
+    }
+
+    private void moveFish(int[][] numbers, int[][] directions, int number, int sharkR, int sharkC) {
+        int r = -1;
+        int c = -1;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (numbers[i][j] == number) {
+                    r = i;
+                    c = j;
+                }
+            }
+        }
+        if (r == -1) {
+            return;
+        }
+
+        int direction = directions[r][c] - 1;
+        for (int turn = 0; turn < 8; turn++) {
+            int nextDirection = (direction + turn) % 8;
+            int nr = r + dr[nextDirection];
+            int nc = c + dc[nextDirection];
+
+            if (nr >= 0 && nr < n && nc >= 0 && nc < n && !(nr == sharkR && nc == sharkC)) {
+                int nextNumber = numbers[nr][nc];
+                int nextFishDirection = directions[nr][nc];
+                numbers[nr][nc] = numbers[r][c];
+                directions[nr][nc] = nextDirection + 1;
+                numbers[r][c] = nextNumber;
+                directions[r][c] = nextFishDirection;
+                return;
+            }
+        }
     }
 }
 
