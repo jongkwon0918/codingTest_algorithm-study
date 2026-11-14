@@ -30,7 +30,7 @@ public class Main4 {
     public static void main(String[] args) {
         Solution4 solution = new Solution4();
         int[][] board = {
-            {0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{1,1,1,1,1},{0,0,0,0,0}
+                {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 1, 1, 1, 1}, {0, 0, 0, 0, 0}
         };
         System.out.println(solution.solution(board, 1)); // 3
         System.out.println(solution.solution(board, 2)); // 5
@@ -39,9 +39,119 @@ public class Main4 {
 }
 
 class Solution4 {
+    int n;
+    int m;
+    int maxKill;
+
     public int solution(int[][] board, int distance) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = board.length;
+        m = board[0].length;
+        maxKill = 0;
+        boolean[] visited = new boolean[m];
+        for (int i = 0; i < m; i++) {
+            dfs(board, distance, visited, i, 1);
+            visited[i] = false;
+        }
+        return maxKill;
+    }
+
+    private void dfs(int[][] board, int distance, boolean[] visited, int i, int hunter) {
+        visited[i] = true;
+        if (hunter == 3) {
+            shooting(board, distance, visited);
+            return;
+        }
+
+        for (int j = i + 1; j < m; j++) {
+            dfs(board, distance, visited, j, hunter + 1);
+            visited[j] = false;
+        }
+    }
+
+    private void shooting(int[][] board, int distance, boolean[] visited) {
+        int[][] tempMap = new int[n][m];
+        List<int[]> list = new ArrayList<>();
+        int kill = 0;
+        for (int i = 0; i < m; i++) {
+            if (visited[i]) {
+                list.add(new int[]{n, i});
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            tempMap[i] = board[i].clone();
+        }
+
+        while (true) {
+            int hunterIdx = 0;
+            boolean[][] targets = new boolean[n][m];
+            while (hunterIdx <= 2) {
+                List<int[]> candidates = new ArrayList<>();
+
+                int hunterR = list.get(hunterIdx)[0];
+                int hunterC = list.get(hunterIdx)[1];
+
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < m; j++) {
+                        if (tempMap[i][j] == 1) {
+                            int currentDistance = Math.abs(i - hunterR) + Math.abs(j - hunterC);
+                            if (currentDistance <= distance) {
+                                candidates.add(new int[]{i, j, currentDistance});
+                            }
+                        }
+                    }
+                }
+                candidates.sort((a, b) -> {
+                    if (a[2] != b[2]) {
+                        return Integer.compare(a[2], b[2]);
+                    }
+                    return Integer.compare(a[1], b[1]);
+                });
+
+                if (!candidates.isEmpty()) {
+                    targets[candidates.get(0)[0]][candidates.get(0)[1]] = true;
+                }
+
+                hunterIdx++;
+            }
+
+            Queue<int[]> queue = new LinkedList<>();
+            for (int i = n - 1; i >= 0; i--) {
+                for (int j = m - 1; j >= 0; j--) {
+                    if (tempMap[i][j] == 1) {
+                        if(!targets[i][j]){
+                            queue.offer(new int[]{i, j});
+                        }else{
+                            tempMap[i][j]=0;
+                            kill++;
+                        }
+
+                    }
+                }
+            }
+
+            if (queue.isEmpty()) {
+                maxKill = Math.max(maxKill, kill);
+                return;
+            }
+
+            while (!queue.isEmpty()) {
+                int[] curr = queue.poll();
+                int r = curr[0];
+                int c = curr[1];
+
+                tempMap[r][c] = 0;
+
+                int nr = r + 1;
+
+                if (nr == n) {
+                    continue;
+                }
+                if (nr < n) {
+                    tempMap[nr][c] = 1;
+                }
+            }
+        }
     }
 }
 

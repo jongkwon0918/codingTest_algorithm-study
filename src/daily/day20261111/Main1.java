@@ -31,9 +31,56 @@ public class Main1 {
 }
 
 class Solution1 {
+    int maxSize;
+    boolean[][] visited;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public int solution(int n, int m, int[][] waste) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        int[][] map = new int[n][m];
+        for(int i=0; i<n; i++){
+            Arrays.fill(map[i],0);
+        }
+        maxSize=0;
+        for(int[] coordinate : waste){
+            int r=coordinate[0]-1;
+            int c=coordinate[1]-1;
+            
+            map[r][c] = 1;
+        }
+        visited = new boolean[n][m];
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(!visited[i][j] && map[i][j]==1){
+                    bfs(i,j,map,n,m);
+                }
+            }
+        }
+        
+        return maxSize;
+    }
+
+    private void bfs(int curri, int currj, int[][] map, int n, int m) {
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{curri, currj});
+        visited[curri][currj]=true;
+        int size=0;
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r=curr[0];
+            int c=curr[1];
+            size+=1;
+            for(int d=0; d<4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && !visited[nr][nc] && map[nr][nc]==1) {
+                    queue.offer(new int[]{nr, nc});
+                    visited[nr][nc]=true;
+                }
+            }
+        }
+
+        maxSize = Math.max(maxSize, size);
     }
 }
 

@@ -38,9 +38,80 @@ public class Main2 {
 }
 
 class Solution2 {
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    int n;
+    int m;
+    boolean[][] fireVisited;
     public String solution(String[] building) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = building.length;
+        m = building[0].length();
+        int[][] map = new int[n][m];
+        Queue<int[]> queue = new LinkedList<>();
+        Queue<int[]> fireQueue = new LinkedList<>();
+        fireVisited = new boolean[n][m];
+        boolean[][] visited = new boolean[n][m];
+        for(int i=0; i<n; i++){
+            Arrays.fill(map[i],-1);
+            for(int j=0; j<m; j++){
+                if(building[i].charAt(j)=='*'){
+                    fireQueue.offer(new int[]{i,j,0});
+                    fireVisited[i][j]=true;
+                    map[i][j]=0;
+                } else if (building[i].charAt(j)=='@') {
+                    queue.offer(new int[]{i,j,0});
+                    visited[i][j]=true;
+                }
+            }
+        }
+
+        while(!fireQueue.isEmpty()) {
+            int[] curr = fireQueue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int cost = curr[2];
+
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
+                    if(!fireVisited[nr][nc] && map[nr][nc]==-1 && building[nr].charAt(nc)!='#'){
+                        fireQueue.offer(new int[]{nr, nc, cost+1});
+                        fireVisited[nr][nc]=true;
+                        map[nr][nc]=cost+1;
+                    }
+                }
+            }
+        }
+
+
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int r = curr[0];
+            int c = curr[1];
+            int cost = curr[2];
+
+            if(r==0 || r==n-1 || c==0 || c==m-1){
+                return String.valueOf(cost+1);
+            }
+
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
+                    if(!visited[nr][nc] && (map[nr][nc]==-1 || cost+1<map[nr][nc]) && building[nr].charAt(nc)!='#'){
+                        queue.offer(new int[]{nr, nc, cost+1});
+                        visited[nr][nc]=true;
+                    }
+                }
+            }
+        }
+
+        return "IMPOSSIBLE";
     }
+
 }
 

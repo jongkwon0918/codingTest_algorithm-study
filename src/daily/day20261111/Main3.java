@@ -28,16 +28,112 @@ S와 F는 쓰레기 옆이어도 두 번째 횟수에 포함하지 않는다.
 public class Main3 {
     public static void main(String[] args) {
         Solution3 solution = new Solution3();
-        System.out.println(Arrays.toString(solution.solution(new String[]{"S..","...","..F"}))); // [0, 0]
-        System.out.println(Arrays.toString(solution.solution(new String[]{"SgF","ggg","..."}))); // [1, 0]
-        System.out.println(Arrays.toString(solution.solution(new String[]{"S.F","ggg","..."}))); // [0, 1]
+        System.out.println(Arrays.toString(solution.solution(new String[]{"S..", "...", "..F"}))); // [0, 0]
+        System.out.println(Arrays.toString(solution.solution(new String[]{"SgF", "ggg", "..."}))); // [1, 0]
+        System.out.println(Arrays.toString(solution.solution(new String[]{"S.F", "ggg", "..."}))); // [0, 1]
     }
 }
 
 class Solution3 {
+    int[] dr = {-1, 1, 0, 0};
+    int[] dc = {0, 0, -1, 1};
+    int n;
+    int m;
+
     public int[] solution(String[] forest) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = forest.length;
+        m = forest[0].length();
+        int startR = 0;
+        int startC = 0;
+        char[][] map = new char[n][m];
+        Queue<int[]> trashQueue = new LinkedList<>();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                map[i][j] = forest[i].charAt(j);
+                if (map[i][j] == 'S') {
+                    startR = i;
+                    startC = j;
+                } else if (map[i][j] == 'g') {
+                    trashQueue.offer(new int[]{i, j});
+                }
+            }
+        }
+
+        while (!trashQueue.isEmpty()) {
+            int[] curr = trashQueue.poll();
+            int r = curr[0];
+            int c = curr[1];
+
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
+                    if (map[nr][nc] == '.') {
+                        map[nr][nc] = 'N';
+                    }
+                }
+            }
+        }
+
+        return dijkstra(startR, startC, map);
+    }
+
+
+    private int[] dijkstra(int startR, int startC, char[][] map) {
+        int[][] trashDist = new int[n][m];
+        int[][] nearDist = new int[n][m];
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(trashDist[i], Integer.MAX_VALUE);
+            Arrays.fill(nearDist[i], Integer.MAX_VALUE);
+        }
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> {
+            if (a[2] != b[2]) {
+                return Integer.compare(a[2], b[2]);
+            }
+            return Integer.compare(a[3], b[3]);
+        });
+        trashDist[startR][startC] = 0;
+        nearDist[startR][startC] = 0;
+        pq.offer(new int[]{startR, startC, 0, 0});
+
+        while (!pq.isEmpty()) {
+            int[] current = pq.poll();
+            int r = current[0];
+            int c = current[1];
+            int trashCnt = current[2];
+            int nearCnt = current[3];
+
+            if (trashCnt > trashDist[r][c] || (trashCnt == trashDist[r][c] && nearCnt > nearDist[r][c])) {
+                continue;
+            }
+            if (map[r][c] == 'F') {
+                return new int[]{trashCnt, nearCnt};
+            }
+
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
+                    int nextTrashCnt = trashCnt;
+                    int nextNearCnt = nearCnt;
+                    if (map[nr][nc] == 'g') {
+                        nextTrashCnt++;
+                    } else if (map[nr][nc] == 'N') {
+                        nextNearCnt++;
+                    }
+
+                    if (nextTrashCnt < trashDist[nr][nc] || (nextTrashCnt == trashDist[nr][nc] && nextNearCnt < nearDist[nr][nc])) {
+                        trashDist[nr][nc] = nextTrashCnt;
+                        nearDist[nr][nc] = nextNearCnt;
+                        pq.offer(new int[]{nr, nc, nextTrashCnt, nextNearCnt});
+                    }
+                }
+            }
+        }
+        return new int[]{};
     }
 }
 
