@@ -41,16 +41,195 @@ public class Main5 {
     public static void main(String[] args) {
         Solution5 solution = new Solution5();
         System.out.println(solution.solution(new int[][]{
-            {2,2,2},{1,0,1},{1,2,1}
-        }, new int[][]{{2,1}})); // 4
-        System.out.println(solution.solution(new int[3][3], new int[][]{{1,1}})); // 0
+                {2, 2, 2}, {1, 0, 1}, {1, 2, 1}
+        }, new int[][]{{2, 1}})); // 4
+        System.out.println(solution.solution(new int[3][3], new int[][]{{1, 1}})); // 0
     }
 }
 
 class Solution5 {
+    int n;
+    int[] dr = {-1, 1, 0, 0};
+    int[] dc = {0, 0, -1, 1};
+    boolean[][] visited;
+    List<int[]> list;
+
     public int solution(int[][] board, int[][] spells) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = board.length;
+        list = new ArrayList<>();
+        int answer = 0;
+        visited = new boolean[n][n];
+        visited[n / 2][n / 2] = true;
+        dfs(list, board, (n / 2) + dr[2], (n / 2) + dc[2], 2);
+
+        for (int i = 0; i < spells.length; i++) {
+            int[] curr = spells[i];
+            int direction = curr[0];
+            int distance = curr[1];
+
+            int r = n / 2;
+            int c = n / 2;
+
+            for (int step = 1; step <= distance; step++) {
+                int targetR = r + dr[direction - 1] * step;
+                int targetC = c + dc[direction - 1] * step;
+                for (int[] ints : list) {
+                    if (ints[0] == targetR && ints[1] == targetC) {
+                        ints[2] = 0;
+                    }
+                }
+            }
+
+            boolean noExplosion = false;
+            while (!noExplosion) {
+                noExplosion = true;
+
+                pull(list);
+
+                int currNum = list.get(0)[2];
+                int currCount = 1;
+                for (int j = 1; j < list.size(); j++) {
+                    if (list.get(j)[2] == currNum) {
+                        currCount++;
+                    } else {
+                        if (currNum != 0 && currCount >= 4) {
+                            for (int delete = j - 1; delete >= j - currCount; delete--) {
+                                answer += list.get(delete)[2];
+                                list.get(delete)[2] = 0;
+                            }
+                            noExplosion = false;
+                        }
+
+                        currNum = list.get(j)[2];
+                        currCount = 1;
+                    }
+                }
+
+                if (currNum != 0 && currCount >= 4) {
+                    for (int delete = list.size() - currCount; delete < list.size(); delete++) {
+                        answer += list.get(delete)[2];
+                        list.get(delete)[2] = 0;
+                    }
+                    noExplosion = false;
+                }
+            }
+
+            pull(list);
+            // 읽는 도중 원본 구슬을 덮어쓰지 않도록 변환 결과를 따로 모은다.
+            List<Integer> nextValues = createNextValues();
+
+            for (int index = 0; index < list.size(); index++) {
+                list.get(index)[2] = index < nextValues.size() ? nextValues.get(index) : 0;
+            }
+        }
+
+
+        return answer;
+    }
+
+    private List<Integer> createNextValues() {
+        List<Integer> nextValues = new ArrayList<>();
+
+        int sumNum = list.get(0)[2];
+        int sumCount = 1;
+        for (int j = 1; j < list.size(); j++) {
+            if (list.get(j)[2] == sumNum) {
+                sumCount++;
+            } else {
+                if (sumNum != 0) {
+                    nextValues.add(sumCount);
+                    nextValues.add(sumNum);
+                }
+
+                if (list.get(j)[2] == 0) {
+                    sumNum = 0;
+                    break;
+                }
+                sumNum = list.get(j)[2];
+                sumCount = 1;
+            }
+        }
+
+        if (sumNum != 0) {
+            nextValues.add(sumCount);
+            nextValues.add(sumNum);
+        }
+        return nextValues;
+    }
+
+    private void pull(List<int[]> list) {
+        List<Integer> values = new ArrayList<>();
+        for (int[] cell : list) {
+            if (cell[2] != 0) {
+                values.add(cell[2]);
+            }
+        }
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i)[2] = i < values.size() ? values.get(i) : 0;
+        }
+    }
+
+    private void dfs(List<int[]> list, int[][] board, int r, int c, int d) {
+        visited[r][c] = true;
+        list.add(new int[]{r, c, board[r][c]});
+
+        if (r == 0 && c == 0) {
+            return;
+        }
+
+        int nr = r;
+        int nc = c;
+        if (d == 0) {
+            int turnR = r + dr[2];
+            int turnC = c + dc[2];
+
+            if (turnR >= 0 && turnR < n && turnC >= 0 && turnC < n && !visited[turnR][turnC]) {
+                nr = turnR;
+                nc = turnC;
+                d = 2;
+            } else {
+                nr += dr[d];
+                nc += dc[d];
+            }
+        } else if (d == 1) {
+            int turnR = r + dr[3];
+            int turnC = c + dc[3];
+
+            if (turnR >= 0 && turnR < n && turnC >= 0 && turnC < n && !visited[turnR][turnC]) {
+                nr = turnR;
+                nc = turnC;
+                d = 3;
+            } else {
+                nr += dr[d];
+                nc += dc[d];
+            }
+        } else if (d == 2) {
+            int turnR = r + dr[1];
+            int turnC = c + dc[1];
+
+            if (turnR >= 0 && turnR < n && turnC >= 0 && turnC < n && !visited[turnR][turnC]) {
+                nr = turnR;
+                nc = turnC;
+                d = 1;
+            } else {
+                nr += dr[d];
+                nc += dc[d];
+            }
+        } else if (d == 3) {
+            int turnR = r + dr[0];
+            int turnC = c + dc[0];
+
+            if (turnR >= 0 && turnR < n && turnC >= 0 && turnC < n && !visited[turnR][turnC]) {
+                nr = turnR;
+                nc = turnC;
+                d = 0;
+            } else {
+                nr += dr[d];
+                nc += dc[d];
+            }
+        }
+
+        dfs(list, board, nr, nc, d);
     }
 }
 
