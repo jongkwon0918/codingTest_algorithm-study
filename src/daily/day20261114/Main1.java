@@ -37,9 +37,57 @@ public class Main1 {
 }
 
 class Solution1 {
+    int n;
+    int m;
+    int maxHaveFriend;
     public int solution(String[] friends) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = friends.length;
+        m = friends[0].length();
+        maxHaveFriend=0;
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i=0; i<n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(friends[i].charAt(j)=='Y'){
+                    graph.get(i).add(j);
+                    graph.get(j).add(i);
+                }
+            }
+        }
+
+        for(int i=0; i<n; i++){
+            bfs(graph, i);
+        }
+
+        return maxHaveFriend;
+    }
+
+    private void bfs(List<List<Integer>> graph, int i) {
+        boolean[] visited = new boolean[n];
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{i, 0});
+        visited[i]=true;
+
+        int haveFriend = 0;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            for(int next : graph.get(currStart)){
+                int nextCost = currCost+1;
+                if(!visited[next] && nextCost<=2){
+                    queue.offer(new int[]{next, nextCost});
+                    visited[next]=true;
+                    haveFriend++;
+                }
+            }
+        }
+
+        maxHaveFriend = Math.max(maxHaveFriend, haveFriend);
     }
 }
 

@@ -1,5 +1,6 @@
 package daily.day20261114;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /*
@@ -33,19 +34,86 @@ public class Main3 {
     public static void main(String[] args) {
         Solution3 solution = new Solution3();
         System.out.println(solution.solution(4, new int[][]{
-            {1,2,2},{2,4,2},{1,3,2},{3,4,2}
+                {1, 2, 2}, {2, 4, 2}, {1, 3, 2}, {3, 4, 2}
         }, 1, 4)); // 2
         System.out.println(solution.solution(4, new int[][]{
-            {1,2,4},{4,2,1},{1,3,3},{4,3,3}
+                {1, 2, 4}, {4, 2, 1}, {1, 3, 3}, {4, 3, 3}
         }, 1, 4)); // -1
-        System.out.println(solution.solution(3, new int[][]{{1,2,2},{2,3,2}}, 1, 3)); // 2
+        System.out.println(solution.solution(3, new int[][]{{1, 2, 2}, {2, 3, 2}}, 1, 3)); // 2
     }
 }
 
 class Solution3 {
     public int solution(int n, int[][] roads, int j, int s) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        List<List<int[]>> graph = new ArrayList<>();
+        for (int i = 0; i <= n; i++) {
+            graph.add(new ArrayList<>());
+        }
+        for (int[] road : roads) {
+            int u = road[0];
+            int v = road[1];
+            int w = road[2];
+
+            graph.get(u).add(new int[]{v, w});
+            graph.get(v).add(new int[]{u, w});
+        }
+
+        int[] distJ = dijkstra(j, graph, n);
+        int[] distS = dijkstra(s, graph, n);
+
+        int minLength = Integer.MAX_VALUE;
+        int minJ = Integer.MAX_VALUE;
+        int answer = -1;
+
+        for (int i = 1; i <= n; i++) {
+            if (i != j && i != s && distJ[i] != Integer.MAX_VALUE && distS[i] != Integer.MAX_VALUE) {
+                minLength = Math.min(minLength, distJ[i] + distS[i]);
+            }
+        }
+
+        for (int i = 1; i <= n; i++) {
+            if (i != j && i != s && distJ[i] != Integer.MAX_VALUE && distS[i] != Integer.MAX_VALUE && distJ[i] + distS[i] == minLength && distJ[i] <= distS[i]) {
+
+                if (minJ > distJ[i]) {
+                    minJ = distJ[i];
+                    answer = i;
+                }
+
+
+            }
+        }
+
+        return answer;
+    }
+
+    private int[] dijkstra(int i, List<List<int[]>> graph, int n) {
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1]));
+        pq.offer(new int[]{i, 0});
+        int[] dist = new int[n + 1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[i] = 0;
+
+        while (!pq.isEmpty()) {
+            int[] curr = pq.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if (dist[currStart] < currCost) {
+                continue;
+            }
+
+            for (int[] next : graph.get(currStart)) {
+                int nextStart = next[0];
+                int nextCost = next[1] + currCost;
+
+                if (dist[nextStart] > nextCost) {
+                    pq.offer(new int[]{nextStart, nextCost});
+                    dist[nextStart] = nextCost;
+                }
+            }
+        }
+
+        return dist;
     }
 }
 

@@ -33,9 +33,33 @@ public class Main2 {
 }
 
 class Solution2 {
+    int max = 100000;
     public int solution(int a, int b, int start, int goal) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        boolean[] visited = new boolean[max+1];
+
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{start, 0});
+        visited[start]=true;
+
+        while(!queue.isEmpty()){
+            int[] curr = queue.poll();
+            int currStart = curr[0];
+            int currCost = curr[1];
+
+            if(currStart==goal){
+                return currCost;
+            }
+
+            int[] nexts = {currStart-1, currStart+1, currStart-a, currStart+a, currStart-b, currStart+b, currStart*a, currStart*b};
+            for(int next : nexts){
+                if(next>=0 && next<=max && !visited[next]){
+                    queue.offer(new int[]{next, currCost+1});
+                    visited[next]=true;
+                }
+            }
+        }
+
+        return -1;
     }
 }
 
