@@ -42,27 +42,134 @@ public class Main5 {
     public static void main(String[] args) {
         Solution5 solution = new Solution5();
         int[][][] priorities = {
-            {{4,1,2,3},{4,1,2,3},{4,1,2,3},{4,1,2,3}},
-            {{3,1,2,4},{3,1,2,4},{3,1,2,4},{3,1,2,4}}
+                {{4, 1, 2, 3}, {4, 1, 2, 3}, {4, 1, 2, 3}, {4, 1, 2, 3}},
+                {{3, 1, 2, 4}, {3, 1, 2, 4}, {3, 1, 2, 4}, {3, 1, 2, 4}}
         };
         System.out.println(solution.solution(new int[][]{
-            {0,0,0},{1,0,2},{0,0,0}
-        }, new int[]{4,3}, priorities, 2)); // 1
+                {0, 0, 0}, {1, 0, 2}, {0, 0, 0}
+        }, new int[]{4, 3}, priorities, 2)); // 1
 
         int[][][] secondPriorities = {
-            {{1,2,3,4},{2,3,4,1},{3,4,1,2},{4,1,2,3}},
-            {{1,2,3,4},{2,3,4,1},{3,4,1,2},{4,1,2,3}}
+                {{1, 2, 3, 4}, {2, 3, 4, 1}, {3, 4, 1, 2}, {4, 1, 2, 3}},
+                {{1, 2, 3, 4}, {2, 3, 4, 1}, {3, 4, 1, 2}, {4, 1, 2, 3}}
         };
         System.out.println(solution.solution(new int[][]{
-            {1,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,2}
-        }, new int[]{4,3}, secondPriorities, 6)); // 26
+                {1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 2}
+        }, new int[]{4, 3}, secondPriorities, 6)); // 26
     }
 }
 
 class Solution5 {
+    int[] dr = {-1, 1, 0, 0};
+    int[] dc = {0, 0, -1, 1};
+    int n;
+    int m;
+    int[][] smellOwner;
+    int[][] smellTime;
+
     public int solution(int[][] board, int[] directions, int[][][] priorities, int k) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+        n = board.length;
+        m = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (board[i][j] != 0) {
+                    m++;
+                }
+            }
+        }
+        smellOwner = new int[n][n];
+        smellTime = new int[n][n];
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < n; c++) {
+                if (board[r][c] != 0) {
+                    smellOwner[r][c] = board[r][c];
+                    smellTime[r][c] = k;
+                }
+            }
+        }
+
+        int time = 0;
+        while (true) {
+            int count = 0;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (board[i][j] != 0) {
+                        count++;
+                    }
+                }
+            }
+
+            if (count == 1) {
+                return time;
+            }
+            if (time >= 1000) {
+                return -1;
+            }
+
+            int[][] tempMap = new int[n][n];
+            for (int i = 0; i < n; i++) {
+                Arrays.fill(tempMap[i], 0);
+            }
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (board[i][j] != 0) {
+                        bfs(i, j, board, directions, priorities, k, tempMap);
+                    }
+                }
+            }
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (smellOwner[i][j] > 0) {
+                        smellTime[i][j]--;
+                        if (smellTime[i][j] == 0) {
+                            smellOwner[i][j] = 0;
+                        }
+                    }
+
+                    if(tempMap[i][j]!=0){
+                        smellOwner[i][j]=tempMap[i][j];
+                        smellTime[i][j]=k;
+                    }
+                }
+            }
+
+            for (int i = 0; i < n; i++) {
+                board[i] = tempMap[i].clone();
+            }
+
+            time++;
+        }
+    }
+
+    private void bfs(int r, int c, int[][] board, int[] directions, int[][][] priorities, int k, int[][] tempMap) {
+        int arrow = directions[board[r][c]-1];
+
+        int moveAgain = 2;
+
+        while(moveAgain!=0) {
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[priorities[board[r][c] - 1][arrow - 1][d] - 1];
+                int nc = c + dc[priorities[board[r][c] - 1][arrow - 1][d] - 1];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
+                    if ((moveAgain == 2 && smellOwner[nr][nc] == 0) || (moveAgain==1 && smellOwner[nr][nc] == board[r][c])){
+                        if(tempMap[nr][nc]!=0) {
+                            tempMap[nr][nc] = Math.min(tempMap[nr][nc], board[r][c]);
+                        } else if(tempMap[nr][nc]==0) {
+                            tempMap[nr][nc]=board[r][c];
+                        }
+                        directions[board[r][c]-1] = priorities[board[r][c] - 1][arrow - 1][d];
+
+                        return;
+                    }
+                }
+            }
+            moveAgain--;
+        }
+        tempMap[r][c]=board[r][c];
     }
 }
+
 
