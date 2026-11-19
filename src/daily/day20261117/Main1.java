@@ -37,8 +37,8 @@ public class Main1 {
 
 class Solution1 {
     public int[] solution(int n, int[][] roads, int[][] queries) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+
+        return new int[]{};
     }
 }
 

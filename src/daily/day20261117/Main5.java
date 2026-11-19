@@ -48,9 +48,12 @@ public class Main5 {
 }
 
 class Solution5 {
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
     public int solution(int[][] fishes, int[] shark, int turns) {
-        // 여기에 구현하세요.
-        throw new UnsupportedOperationException("아직 구현하지 않았습니다.");
+
+
+        return 0;
     }
 }
 
